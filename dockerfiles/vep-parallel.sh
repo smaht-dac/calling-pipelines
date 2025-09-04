@@ -14,12 +14,13 @@ IFS=$'\n\t'
 usage() {
   cat <<EOF
 Usage: $0 -i input.vcf.gz -r reference.fasta -l regions.txt -v vep.tar.gz
-          [-o prefix] [-a assembly] [-s species]
+          [-g gnomad.vcf.gz] [-o prefix] [-a assembly] [-s species]
 
   -i   Input VCF (bgzipped) with .tbi index (required)
   -r   Reference FASTA with .fai index (required)
   -l   Regions list file (one region per line, e.g. chr1:1-1000000) (required)
   -v   VEP database archive (tar.gz) (required)
+  -g   gnomAD VCF file (bgzipped) with .tbi index (optional)
   -o   Prefix for the output annotated VCF (default: output)
        The final output will be <prefix>.vep.vcf.gz
   -a   Assembly (default: GRCh38)
@@ -34,18 +35,20 @@ INPUT_VCF=""
 REFERENCE_FASTA=""
 REGIONFILE=""
 VEP_DB=""
+GNOMAD_VCF=""
 OUTPUT_PRFX="output"
 ASSEMBLY="GRCh38"
 NTHREADS="$(nproc)"
 SPECIES="homo_sapiens"
 
 # Parse args
-while getopts "i:r:l:v:o:a:s:h" opt; do
+while getopts "i:r:l:v:g:o:a:s:h" opt; do
   case $opt in
     i) INPUT_VCF="$OPTARG" ;;
     r) REFERENCE_FASTA="$OPTARG" ;;
     l) REGIONFILE="$OPTARG" ;;
     v) VEP_DB="$OPTARG" ;;
+    g) GNOMAD_VCF="$OPTARG" ;;
     o) OUTPUT_PRFX="$OPTARG" ;;
     a) ASSEMBLY="$OPTARG" ;;
     s) SPECIES="$OPTARG" ;;
@@ -74,6 +77,12 @@ command -v bcftools >/dev/null 2>&1 || { echo "Error: bcftools not found in PATH
 [[ -f "$VEP_DB" ]] || { echo "Error: VEP database archive $VEP_DB not found"; exit 1; }
 [[ -s "$REGIONFILE" ]] || { echo "Error: regions file $REGIONFILE is empty"; exit 1; }
 
+# Optional input checks
+if [[ -n "$GNOMAD_VCF" ]]; then
+  [[ -f "$GNOMAD_VCF" ]] || { echo "Error: $GNOMAD_VCF not found"; exit 1; }
+  [[ -f "${GNOMAD_VCF}.tbi" ]] || { echo "Error: ${GNOMAD_VCF}.tbi index not found"; exit 1; }
+fi
+
 # Unpack VEP
 EXTRACT_DIR="$(mktemp -d vep_cache.XXXXXX)"
 echo "Unpacking VEP database in $EXTRACT_DIR ..."
@@ -99,6 +108,11 @@ OPTIONS=(
     --no_stats
     --species "$SPECIES"
 )
+
+# Add gnomAD options if provided
+if [[ -n "$GNOMAD_VCF" ]]; then
+    OPTIONS+=( --custom file="$GNOMAD_VCF",short_name=gnomADc,format=vcf,type=exact,fields=AC_joint%AN_joint%AF_joint%AC_exomes%AN_exomes%AF_exomes%AC_genomes%AN_genomes%AF_genomes%AC_grpmax_joint%AF_grpmax_joint%AN_grpmax_joint%AC_grpmax_exomes%AF_grpmax_exomes%AN_grpmax_exomes%AC_grpmax_genomes%AF_grpmax_genomes%AN_grpmax_genomes )
+fi
 
 # Temp workspace
 WORKDIR="$(mktemp -d vep_shards.XXXXXX)"
