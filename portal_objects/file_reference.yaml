@@ -1,0 +1,48 @@
+################################################################
+# Resource files for Variant Effect Predictor (VEP), 114
+#   https://ftp.ensembl.org/pub/release-114/variation/indexed_vep_cache/homo_sapiens_vep_114_GRCh38.tar.gz
+################################################################
+name: vep-database
+description: Variant Effect Predictor (VEP) database. |
+             Version 114. |
+             Build hg38/GRCh38
+format: tar_gz
+version: '114'
+category:
+  - Genome Annotation
+type:
+  - Gene Model
+# Required to enable sync with a reference bucket
+uuid: 690dc785-2659-4bfd-8661-a0b381d0fc23
+accession: SMAFI25AZ2E1
+
+---
+
+################################################################
+# gnomAD Joint Frequency, v4.1.0
+#   https://gnomad.broadinstitute.org/data#v4
+#   The full gnomAD has been filtered to include only the following
+#   fields for minimal annotation:
+#     - AC_joint, AN_joint, AF_joint
+#     - AC_exomes, AN_exomes, AF_exomes
+#     - AC_genomes, AN_genomes, AF_genomes
+#     - AC_grpmax_joint, AF_grpmax_joint, AN_grpmax_joint
+#     - AC_grpmax_exomes, AF_grpmax_exomes, AN_grpmax_exomes
+#     - AC_grpmax_genomes, AF_grpmax_genomes, AN_grpmax_genomes
+################################################################
+name: gnomad-database-minimal
+description: gnomAD v4.1.0 Joint Frequency database. |
+             Filtered to minimal set of annotations. |
+             Build hg38/GRCh38
+format: vcf_gz
+version: v4.1.0
+secondary_files:
+  - vcf_gz_tbi
+category:
+  - Germline Variant Calls
+type:
+  - SNV
+  - Indel
+# Required to enable sync with a reference bucket
+uuid: 0fa5b3a2-9cdb-4333-b703-5770d07a5f82
+accession: SMAFIS5AZ2P4
