@@ -53,9 +53,20 @@ command -v bcftools >/dev/null 2>&1 || { echo "Error: bcftools not found in PATH
 [[ -f "$REFERENCE_FASTA" ]] || { echo "Error: $REFERENCE_FASTA not found"; exit 1; }
 [[ -f "${REFERENCE_FASTA}.fai" ]] || { echo "Error: ${REFERENCE_FASTA}.fai not found"; exit 1; }
 
+# Check header to set the filter correctly
+bcftools view --header-only "$INPUT_VCF" > tmp_HEAD
+trap 'rm -f tmp_HEAD' EXIT
+
+# Set filter based on header
+ if grep -q -m1 'FEX' tmp_HEAD; then
+    FILTER='FILTER=="PASS" || INFO/FEX == "PASS"'
+else
+    FILTER='FILTER=="PASS"'
+fi
+
 # Process VCF
 echo "Processing VCF..."
-bcftools view --threads "$NTHREADS" -i 'FILTER=="PASS" || INFO/FEX == "PASS"' -Ou "$INPUT_VCF" \
+bcftools view --threads "$NTHREADS" -i "$FILTER" -Ou "$INPUT_VCF" \
     | bcftools norm --threads "$NTHREADS" --check-ref x -m -any --atomize -f "$REFERENCE_FASTA" -Ou - \
     | bcftools norm --threads "$NTHREADS" -d exact -Oz -o "${OUTPUT_PRFX}.vcf.gz" - || { echo "Error: bcftools normalization failed"; exit 1; }
 
