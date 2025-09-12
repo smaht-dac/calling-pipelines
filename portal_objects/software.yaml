@@ -6,3 +6,14 @@ version: '114'
 source_url: https://github.com/Ensembl/ensembl-vep
 category:
   - Feature Annotation
+
+---
+
+################################################################
+# minipileup, 1.4b
+################################################################
+name: minipileup
+version: '1.4b'
+source_url: https://github.com/lh3/minipileup
+category:
+  - Variant Calling
