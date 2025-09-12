@@ -58,7 +58,7 @@ bcftools view --header-only "$INPUT_VCF" > tmp_HEAD
 trap 'rm -f tmp_HEAD' EXIT
 
 # Set filter based on header
- if grep -q -m1 'FEX' tmp_HEAD; then
+if grep -q -m1 'FEX' tmp_HEAD; then
     FILTER='FILTER=="PASS" || INFO/FEX == "PASS"'
 else
     FILTER='FILTER=="PASS"'
