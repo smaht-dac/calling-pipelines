@@ -54,11 +54,12 @@ command -v bcftools >/dev/null 2>&1 || { echo "Error: bcftools not found in PATH
 [[ -f "${REFERENCE_FASTA}.fai" ]] || { echo "Error: ${REFERENCE_FASTA}.fai not found"; exit 1; }
 
 # Check header to set the filter correctly
-bcftools view --header-only "$INPUT_VCF" > tmp_HEAD
-trap 'rm -f tmp_HEAD' EXIT
+TMP_HEAD="$(mktemp ./HEAD_XXXXXX)"
+bcftools view --header-only "$INPUT_VCF" > "$TMP_HEAD"
+trap 'rm -f "$TMP_HEAD"' EXIT
 
 # Set filter based on header
-if grep -q -m1 'FEX' tmp_HEAD; then
+if grep -q -m1 'FEX' "$TMP_HEAD"; then
     FILTER='FILTER=="PASS" || INFO/FEX == "PASS"'
 else
     FILTER='FILTER=="PASS"'
@@ -73,4 +74,6 @@ bcftools view --threads "$NTHREADS" -i "$FILTER" -Ou "$INPUT_VCF" \
 bcftools index --threads "$NTHREADS" --tbi "${OUTPUT_PRFX}.vcf.gz" || { echo "Error: bcftools index failed"; exit 1; }
 
 # All done
-echo "Output written to ${OUTPUT_PRFX}.vcf.gz and ${OUTPUT_PRFX}.vcf.gz.tbi"
+echo "Done:"
+echo "  VCF : ${OUTPUT_PRFX}.vcf.gz"
+echo "  TBI : ${OUTPUT_PRFX}.vcf.gz.tbi"

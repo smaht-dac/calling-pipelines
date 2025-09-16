@@ -79,6 +79,10 @@ RUN ln -s minipileup-1.4b minipileup
 COPY bcftools_PASS_norm_dedup.sh .
 RUN chmod +x bcftools_PASS_norm_dedup.sh
 
+## bcftools_regions
+COPY bcftools_regions.sh .
+RUN chmod +x bcftools_regions.sh
+
 #######################################################################
 #     Update env
 #######################################################################
