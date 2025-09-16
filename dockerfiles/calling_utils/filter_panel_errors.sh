@@ -61,8 +61,7 @@ command -v bcftools        >/dev/null 2>&1 || { echo "Error: bcftools not found 
 
 # Run filter_by_poe.py
 OUT_VCF="${OUTPUT_PRFX}.vcf"
-cleanup() { rm -f "$OUT_VCF" }
-trap cleanup EXIT
+trap 'rm -f "$OUT_VCF"' EXIT
 
 echo "Running filter_by_poe.py..."
 filter_by_poe.py --vcf "$INPUT_VCF" \
