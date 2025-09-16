@@ -63,13 +63,13 @@ for bed in "${EXCLUDE_BEDS[@]}"; do
   TMP_OUT="$(mktemp ./XXXXXX.vcf)"; TMP_FILES+=("$TMP_OUT")
 
   echo "Excluding regions in $bed ..."
-  bcftools view --threads "$NTHREADS" -T "^$bed" -Ov -o "$TMP_OUT" "$CURRENT_IN"
+  bcftools view --threads "$NTHREADS" -T "^$bed" -Ov -o "$TMP_OUT" "$CURRENT_IN" || { echo "Error: bcftools view failed"; exit 1; }
   CURRENT_IN="$TMP_OUT"
 done
 
 # Compress-rename output and index
-bcftools view --threads "$NTHREADS" -Oz -o "${OUTPUT_PRFX}.vcf.gz" "$CURRENT_IN"
-bcftools index --threads "$NTHREADS" --tbi "${OUTPUT_PRFX}.vcf.gz"
+bcftools view --threads "$NTHREADS" -Oz -o "${OUTPUT_PRFX}.vcf.gz" "$CURRENT_IN" || { echo "Error: bcftools view failed"; exit 1; }
+bcftools index --threads "$NTHREADS" --tbi "${OUTPUT_PRFX}.vcf.gz" || { echo "Error: bcftools index failed"; exit 1; }
 
 # All done
 echo "Done:"

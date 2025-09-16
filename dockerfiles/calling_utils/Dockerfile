@@ -83,9 +83,19 @@ RUN chmod +x bcftools_PASS_norm_dedup.sh
 COPY bcftools_regions.sh .
 RUN chmod +x bcftools_regions.sh
 
+## filter_panel_errors
+COPY filter_panel_errors.sh .
+RUN chmod +x filter_panel_errors.sh
+
+## scripts/
+# filter_by_poe.py
+COPY scripts/filter_by_poe.py .
+RUN chmod +x filter_by_poe.py
+
 #######################################################################
 #     Update env
 #######################################################################
+ENV PATH=/usr/local/bin/:$PATH
 ENV PATH=/usr/local/bin/samtools/:$PATH
 ENV PATH=/usr/local/bin/bcftools/:$PATH
 ENV PATH=/usr/local/bin/minipileup/:$PATH
