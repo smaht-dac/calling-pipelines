@@ -1,7 +1,7 @@
 #######################################################################
 #     Basic image
 #######################################################################
-FROM public.ecr.aws/smaht-dac/base-ubuntu2204-py38:0.0.1
+FROM public.ecr.aws/smaht-dac/base-ubuntu2204-py39:0.0.1
 
 LABEL maintainers="Michele Berselli (berselli.michele@gmail.com)"
 
