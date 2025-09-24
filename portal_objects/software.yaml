@@ -6,6 +6,7 @@ version: '114'
 source_url: https://github.com/Ensembl/ensembl-vep
 category:
   - Feature Annotation
+  - Variant Annotation
 
 ---
 
@@ -17,3 +18,16 @@ version: '1.4b'
 source_url: https://github.com/lh3/minipileup
 category:
   - Variant Calling
+
+---
+
+################################################################
+# granite-suite, 0.5.0
+################################################################
+name: granite-suite
+version: '0.5.0'
+source_url: https://github.com/dbmi-bgm/granite
+category:
+  - Variant Calling
+  - Variant Annotation
+  - Variant Manipulation

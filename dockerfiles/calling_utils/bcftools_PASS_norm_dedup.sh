@@ -60,7 +60,7 @@ trap 'rm -f "$TMP_HEAD"' EXIT
 
 # Set filter based on header
 if grep -q -m1 'FEX' "$TMP_HEAD"; then
-    FILTER='FILTER=="PASS" || INFO/FEX == "PASS"'
+    FILTER='FILTER=="PASS" || INFO/FEX=="PASS"'
 else
     FILTER='FILTER=="PASS"'
 fi

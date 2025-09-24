@@ -33,9 +33,12 @@ ENV LC_ALL=en_US.UTF-8
 #     Software
 #######################################################################
 ## Conda install
-#- pysam required by AddReadGroups.py
+#- pysam required by filter_by_poe.py
 RUN conda install -c bioconda -y pysam==0.21.0 && \
     conda clean -a -y -f
+
+## granite
+RUN pip install granite-suite==0.5.0
 
 ## Samtools install
 RUN wget https://github.com/samtools/samtools/releases/download/1.17/samtools-1.17.tar.bz2 && \
@@ -86,6 +89,10 @@ RUN chmod +x bcftools_regions.sh
 ## filter_panel_errors
 COPY filter_panel_errors.sh .
 RUN chmod +x filter_panel_errors.sh
+
+## compress_index_vcf
+COPY compress_index_vcf.sh .
+RUN chmod +x compress_index_vcf.sh
 
 ## scripts/
 # filter_by_poe.py
