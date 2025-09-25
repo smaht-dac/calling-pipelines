@@ -86,13 +86,17 @@ RUN chmod +x bcftools_PASS_norm_dedup.sh
 COPY bcftools_regions.sh .
 RUN chmod +x bcftools_regions.sh
 
+## compress_index_vcf
+COPY compress_index_vcf.sh .
+RUN chmod +x compress_index_vcf.sh
+
 ## filter_panel_errors
 COPY filter_panel_errors.sh .
 RUN chmod +x filter_panel_errors.sh
 
-## compress_index_vcf
-COPY compress_index_vcf.sh .
-RUN chmod +x compress_index_vcf.sh
+## split_snvs_indels
+COPY split_snvs_indels.sh .
+RUN chmod +x split_snvs_indels.sh
 
 ## scripts/
 # filter_by_poe.py
