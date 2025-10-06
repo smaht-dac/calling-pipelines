@@ -27,7 +27,8 @@ inputs:
     default: "output.vcf.gz"
     inputBinding:
       position: 3
-    doc: Output file in VCF format. Compressed with bgzip (use .vcf.gz suffix)
+    doc: Output file in VCF format. Compressed with bgzip. |
+         Use .vcf.gz suffix, this is required by the script to compress the file with bgzip
 
   - id: window_size
     type: int
