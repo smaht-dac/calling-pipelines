@@ -103,6 +103,10 @@ RUN chmod +x split_snvs_indels.sh
 COPY scripts/filter_by_poe.py .
 RUN chmod +x filter_by_poe.py
 
+# filter_clustered_variants.py
+COPY scripts/filter_clustered_variants.py .
+RUN chmod +x filter_clustered_variants.py
+
 #######################################################################
 #     Update env
 #######################################################################
