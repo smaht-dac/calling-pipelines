@@ -98,6 +98,10 @@ RUN chmod +x filter_panel_errors.sh
 COPY split_snvs_indels.sh .
 RUN chmod +x split_snvs_indels.sh
 
+## minipileup-parallel
+COPY minipileup-parallel.sh .
+RUN chmod +x minipileup-parallel.sh
+
 ## scripts/
 # filter_by_poe.py
 COPY scripts/filter_by_poe.py .
