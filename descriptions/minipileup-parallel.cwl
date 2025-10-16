@@ -28,7 +28,7 @@ inputs:
     secondaryFiles:
       - ^.dict
       - .fai
-    doc: Reference FASTA with .fai (and optionally .dict)
+    doc: Reference FASTA with index files
 
   - id: input_files_sr_cram
     type:
@@ -41,7 +41,7 @@ inputs:
       - .crai
     inputBinding:
       position: 3
-    doc: Short-read CRAM (with .crai)
+    doc: Short-read CRAM files (with .crai)
 
   - id: input_files_pb_cram
     type:
@@ -54,7 +54,7 @@ inputs:
       - .crai
     inputBinding:
       position: 4
-    doc: PacBio CRAM (with .crai)
+    doc: PacBio CRAM files (with .crai)
 
   - id: input_files_ont_cram
     type:
@@ -67,7 +67,7 @@ inputs:
       - .crai
     inputBinding:
       position: 5
-    doc: ONT CRAM (with .crai)
+    doc: ONT CRAM files (with .crai)
 
   - id: output_prefix
     type: string

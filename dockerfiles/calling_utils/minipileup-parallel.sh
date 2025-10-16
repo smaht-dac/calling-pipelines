@@ -24,9 +24,9 @@ Usage: $0 -i input.vcf.gz -r reference.fasta [-o prefix] \\
   -t             Parallel jobs/threads for xargs (default: number of CPUs)
   --args         Additional arguments to pass to minipileup (in quotes) (default: "-c -C -Q 20 -q 30 -s 0")
 
-  --sr-cram      Short-read CRAM, also accept BAM (repeatable)
-  --pb-cram      PacBio long-read CRAM, also accept BAM (repeatable)
-  --ont-cram     ONT long-read CRAM, also accept BAM (repeatable)
+  --sr-cram      Short-read CRAM with .crai file, also accept BAM with .bai or .csi index (repeatable)
+  --pb-cram      PacBio long-read CRAM with .crai file, also accept BAM with .bai or .csi index (repeatable)
+  --ont-cram     ONT long-read CRAM with .crai file, also accept BAM with .bai or .csi index (repeatable)
 
   --group        Group intervals into batches of INT for processing (default: 100)
 EOF
