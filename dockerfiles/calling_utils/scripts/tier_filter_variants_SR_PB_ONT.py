@@ -486,10 +486,12 @@ class TieredVCF:
                             glm_pvals.append(binom_result.p_value_SR)
                     if binom_result.p_value_PB is not None:
                         record.info["GLM_PVAL_PB"] = binom_result.p_value_PB
-                        glm_pvals.append(binom_result.p_value_PB)
+                        if tier == "TIER1":
+                            glm_pvals.append(binom_result.p_value_PB)
                     if binom_result.p_value_ONT is not None:
                         record.info["GLM_PVAL_ONT"] = binom_result.p_value_ONT
-                        glm_pvals.append(binom_result.p_value_ONT)
+                        if tier == "TIER1":
+                            glm_pvals.append(binom_result.p_value_ONT)
                     if glm_pvals:
                         record.info["GLM_PVAL"] = min(glm_pvals)
                     # Write record
