@@ -362,7 +362,7 @@ class TieredVCF:
         try: 
             _, p_value = fisher_exact(table, alternative="two-sided")
         except Exception as e:
-            p_value = 1.0  # If error, return non-significant p-value
+            p_value = 0  # If error, return non-significant p-value for the alpha comparison
         # Store result
         self.tests.setdefault(key, dict())
         self.tests[key]["fisher"] = FisherTestResult(group, p_value)
@@ -481,16 +481,16 @@ class TieredVCF:
                     # Add Binomial test results to INFO fields
                     glm_pvals = []
                     if binom_result.p_value_SR is not None:
-                        record.info["GLM_PVAL_SR"] = binom_result.p_value_SR
                         if tier == "TIER2":
+                            record.info["GLM_PVAL_SR"] = binom_result.p_value_SR
                             glm_pvals.append(binom_result.p_value_SR)
                     if binom_result.p_value_PB is not None:
-                        record.info["GLM_PVAL_PB"] = binom_result.p_value_PB
                         if tier == "TIER1":
+                            record.info["GLM_PVAL_PB"] = binom_result.p_value_PB
                             glm_pvals.append(binom_result.p_value_PB)
                     if binom_result.p_value_ONT is not None:
-                        record.info["GLM_PVAL_ONT"] = binom_result.p_value_ONT
                         if tier == "TIER1":
+                            record.info["GLM_PVAL_ONT"] = binom_result.p_value_ONT
                             glm_pvals.append(binom_result.p_value_ONT)
                     if glm_pvals:
                         record.info["GLM_PVAL"] = min(glm_pvals)
