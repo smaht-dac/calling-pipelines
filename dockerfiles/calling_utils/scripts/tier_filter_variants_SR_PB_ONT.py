@@ -516,9 +516,9 @@ if __name__ == "__main__":
     parser.add_argument("--strand_alpha", type=float, default=0.01,
                     help="Keep if Fisher p >= this (default: 0.01)")
     parser.add_argument("--germline_alpha", type=float, default=0.01,
-                    help="Keep if Binomial p < this (default: 0.01)")
+                    help="Keep if Binomial p <= this (default: 0.01)")
     parser.add_argument("--germline_alpha_SR", type=float, default=0.01,
-                    help="Keep if Binomial p < this. SR (Short-reads) only (default: 0.01)")
+                    help="Keep if Binomial p <= this. SR (Short-reads) only (default: 0.01)")
     parser.add_argument("--min_alt_PB", type=int, default=2,
                     help="Min ALT reads for PB (PacBio) to use PB counts for the strand test (default: 2)")
     parser.add_argument("--min_alt_binom", type=int, default=1,
