@@ -243,7 +243,8 @@ class FisherTestResult:
     def is_pass(self, alpha: float):
         """Check if p-value passes threshold at alpha.
         """
-        return self.p_value >= alpha
+        if self.p_value >= alpha: return True
+        return False
 
 class BinomialTestResult:
     """Store binomial test result.
@@ -359,10 +360,10 @@ class TieredVCF:
         # Fisher's exact test
         table = [[REF_ADF, REF_ADR],
                  [ALT_ADF, ALT_ADR]]
-        try: 
+        try:
             _, p_value = fisher_exact(table, alternative="two-sided")
         except Exception as e:
-            p_value = 0  # If error, return non-significant p-value for the alpha comparison
+            p_value = 0.0  # On error, force an extreme low p so the variant FAILS Fisher (conservative).
         # Store result
         self.tests.setdefault(key, dict())
         self.tests[key]["fisher"] = FisherTestResult(group, p_value)
@@ -509,9 +510,9 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Tier variants and filter by strand balance (Fisher) and germline deviation (binomial). Only SNVs are considered for tiering.")
 
-    parser.add_argument("-i", "--input_vcf", help="Input VCF with variants to tier. Assumes normalized with bcftools norm -m -any. Compressed (.vcf.gz) or uncompressed (.vcf) VCF")
-    parser.add_argument("-m", "--minipileup_vcf", help="Minipileup VCF with ADF/ADR counts. Compressed (.vcf.gz) or uncompressed (.vcf) VCF")
-    parser.add_argument("-o", "--output_vcf", help="Output VCF with tiered and filtered variants. Compressed (.vcf.gz) or uncompressed (.vcf) VCF")
+    parser.add_argument("-i", "--input_vcf", required=True, help="Input VCF with variants to tier. Assumes normalized with bcftools norm -m -any. Compressed (.vcf.gz) or uncompressed (.vcf) VCF")
+    parser.add_argument("-m", "--minipileup_vcf", required=True, help="Minipileup VCF with ADF/ADR counts. Compressed (.vcf.gz) or uncompressed (.vcf) VCF")
+    parser.add_argument("-o", "--output_vcf", required=True, help="Output VCF with tiered and filtered variants. Compressed (.vcf.gz) or uncompressed (.vcf) VCF")
 
     parser.add_argument("--strand_alpha", type=float, default=0.01,
                     help="Keep if Fisher p >= this (default: 0.01)")
