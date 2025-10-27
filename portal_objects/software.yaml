@@ -31,3 +31,16 @@ category:
   - Variant Calling
   - Variant Annotation
   - Variant Manipulation
+
+---
+
+################################################################
+# Strelka2, 2.9.10
+################################################################
+name: Strelka2
+version: '2.9.10'
+source_url: https://github.com/Illumina/strelka
+category:
+  - Variant Calling
+# Required for displaying in the file name
+code: strelka2
