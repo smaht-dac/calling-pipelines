@@ -46,3 +46,139 @@ type:
 # Required to enable sync with a reference bucket
 uuid: 0fa5b3a2-9cdb-4333-b703-5770d07a5f82
 accession: SMAFIS5AZ2P4
+
+---
+
+################################################################
+# Segmental duplication regions from UCSC, GRCh38
+#   https://genome.ucsc.edu/cgi-bin/hgTables
+#   -Clade: Mammal -Genome: Human -Assembly: Dec. 2013 (GRCh38)
+#   -Group: Repeats -Track: Segmental Dups
+#   -Table: genomicSuperDups
+################################################################
+name: ucsc-segmental-duplication-regions
+description: Segmental duplication regions from UCSC. |
+             Build hg38/GRCh38
+format: bed_gz
+version: 'GRCh38'
+category:
+  - Genome Region
+type:
+  - Sequence Interval
+# Required to enable sync with a reference bucket
+uuid: 7b0d76f8-5c58-4a76-bc80-2a08e881d3b3
+accession: SMAFISG1ZQPS
+
+---
+
+################################################################
+# Centromere regions from UCSC, GRCh38
+#   https://genome.ucsc.edu/cgi-bin/hgTables
+#   -Clade: Mammal -Genome: Human -Assembly: Dec. 2013 (GRCh38)
+#   -Group: All Tracks -Track: Centromeres
+#   -Table: centromeres
+################################################################
+name: ucsc-centromere-regions
+description: Centromere regions from UCSC. |
+             Build hg38/GRCh38
+format: bed_gz
+version: 'GRCh38'
+category:
+  - Genome Region
+type:
+  - Sequence Interval
+# Required to enable sync with a reference bucket
+uuid: 4dd3ad0e-2bcc-4556-8e37-39e540bad2c6
+accession: SMAFIJE1V9P7
+
+---
+
+################################################################
+# Panel of Normals (PON) from Brain Somatic Mosaicism Network (BSMN), 
+#   https://www.synapse.org/Synapse:syn22024535
+################################################################
+name: bsmn-pon
+description: Panel of Normals (PON) from Brain Somatic Mosaicism Network (BSMN). |
+             Build hg38/GRCh38
+format: fa
+version: 'syn22024535_GRCh38'
+secondary_files:
+  - fa_fai
+category:
+  - Germline Variant Calls
+  - Somatic Variant Calls
+type:
+  - SNV
+# Required to enable sync with a reference bucket
+uuid: 5ab614d5-24eb-4db5-9348-735c3c43735f
+accession: SMAFIGG1V1SA
+
+---
+
+################################################################
+# Simple Repeats and Satellite regions from UCSC, GRCh38
+#   https://genome.ucsc.edu/cgi-bin/hgTables
+#   -Clade: Mammal -Genome: Human -Assembly: Dec. 2013 (GRCh38)
+#   -Group: Repeats -Track: RepeatMasker
+#   -Table: rmsk -Filter “repClass = ‘Simple_repeat’ or repClass = ‘Satellite’”
+################################################################
+name: ucsc-simple-repeats-satellite-regions
+description: Simple Repeats and Satellite regions from UCSC. |
+             Build hg38/GRCh38
+format: bed_gz
+version: 'GRCh38'
+category:
+  - Genome Region
+type:
+  - Sequence Interval
+# Required to enable sync with a reference bucket
+uuid: e45a8419-c1a1-4d74-bb8f-1cd9ea15a0bd
+accession: SMAFIK21VAC2
+
+---
+
+################################################################
+# 1000G + Mills Indels, GRCh38
+#  Modified into BED format for use in pipelines
+#  Extend regions by 5bp on each side
+#
+# bcftools query -f'%CHROM\t%POS0\t%END\n' mills_1kg_gold_standard_indels.vcf.gz | \
+# awk -v OFS='\t' -v s=5 '{start=$2-s; if(start<0) start=0; end=$3+s; print $1,start,end}' | \
+# bedtools merge -i - > 1kg.slop5.bed
+################################################################
+name: mills-1000g-gold-standard-indel-5bp-extended
+description: Mills and 1000G Gold Standard indels extended by 5bp on each side. |
+             Build hg38/GRCh38
+format: bed_gz
+version: 'GRCh38'
+category:
+  - Germline Variant Calls
+type:
+  - Indel
+  - Sequence Interval
+# Required to enable sync with a reference bucket
+uuid: 824e088f-8490-41c7-839d-676533bfd4c7
+accession: SMAFI8FY15LX
+
+---
+
+################################################################
+# Strelka2 genomic regions, GCA_000001405.15_GRCh38_no_decoy
+#  BED file of regions to be used with Strelka2 variant caller
+#  Each region is roughly 120M bases in size, 32 regions total
+################################################################
+name: strelka2-32regions-120M
+description: Genomic regions to run Strelka2 distributed variant calling. |
+             Each region spans roughly 120M bases. The genome is split into 32 regions. |
+             Build hg38/GRCh38
+format: bed_gz
+version: GCA_000001405.15_GRCh38_no_decoy
+secondary_files:
+  - bed_gz_tbi
+category:
+  - Genome Region
+type:
+  - Sequence Interval
+# Required to enable sync with a reference bucket
+uuid: 89fbc2ef-21ca-4f3f-9934-e0f4673e7687
+accession: SMAFI4J5H6NQ
