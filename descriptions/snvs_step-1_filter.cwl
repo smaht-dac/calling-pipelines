@@ -34,21 +34,29 @@ inputs:
       - .fai
     doc: Panel of normals in FASTA format with the corresponding index file
 
-  - id: window_size
-    type: int
-    default: 100
-    doc: Window size in bp [100]
+  - id: regions_list_txt
+    type: File
+    doc: Regions list file (one region per line, e.g. chr1:1-1000000)
+
+  - id: vep_database_archive
+    type: File
+    doc: Compressed VEP database archive (tar.gz)
+
+  - id: gnomad_vcf_gz
+    type: File
+    secondaryFiles:
+      - .tbi
+    doc: Compressed gnomAD VCF file with corresponding index file
 
   - id: tag_filters
     type: string[]
     doc: One or more tag filters. |
          Format "name/value/operator/type/logic[/field=sep][/entry=sep]"
 
-  - id: filters_logic
-    type: string
-    default: null
-    doc: Across-tag logic (combine multiple tag filters). |
-         Accept "any" or "all" [any]
+  - id: window_size
+    type: int
+    default: 100
+    doc: Window size in bp [100]
 
 outputs:
   output_snvs_vcf_gz:
@@ -100,15 +108,29 @@ steps:
     out:
       - output_file_vcf_gz
 
+  vep_parallel:
+    run: vep-parallel.cwl
+    in:
+      input_file_vcf_gz:
+        source: filter_clustered_variants/output_file_vcf_gz
+      regions_list_txt:
+        source: regions_list_txt
+      vep_database_archive:
+        source: vep_database_archive
+      gnomad_vcf_gz:
+        source: gnomad_vcf_gz
+      genome_reference_fasta:
+        source: genome_reference_fasta
+    out:
+      - output_file_vcf_gz
+
   granite_filterByTag:
     run: granite_filterByTag.cwl
     in:
       input_file_vcf_gz:
-        source: filter_clustered_variants/output_file_vcf_gz
+        source: vep_parallel/output_file_vcf_gz
       tag_filters:
         source: tag_filters
-      filters_logic:
-        source: filters_logic
     out:
       - output_file_vcf
 
@@ -132,5 +154,5 @@ steps:
 doc: |
   Filters raw SNVs and Indels VCF files to retain high-confidence variants. |
   Step-1 filters: PASS calls; normalize and atomize variants; remove genomic regions; |
-  Brain Somatic Mosaicism Network (BSMN) filter; remove clustered variants; allele frequency filter. |
+  Brain Somatic Mosaicism Network (BSMN) filter; remove clustered variants; run VEP and filter by allele frequency. |
   Splits the filtered variants into separate SNVs and Indels VCF files
