@@ -66,7 +66,7 @@ inputs:
       prefix: -o
     doc: Output prefix -> <prefix>.snvs.vcf.gz / <prefix>.indels.vcf.gz
 
-  - id: threads
+  - id: nthreads
     type: int
     default: null
     inputBinding:
@@ -92,5 +92,5 @@ outputs:
     doc: Strelka2 somatic indels VCF file (bgzipped) with index
 
 doc: |
-  Wrapper for strelka2_region.sh to run Strelka2 paired somatic variant calling on specific regions |
+  Wrapper for strelka2_region.sh to run Strelka2 paired-mode for somatic variant calling on specific regions |
   from a BED file (optionally a specific line in the BED file). Use CRAM files as input

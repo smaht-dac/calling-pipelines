@@ -104,4 +104,4 @@ outputs:
 
 doc: |
   Run minipileup in parallel on multiple CRAM files (short-read, PacBio, ONT).
-  Outputs a compressed VCF with index.
+  Outputs a compressed VCF with index
