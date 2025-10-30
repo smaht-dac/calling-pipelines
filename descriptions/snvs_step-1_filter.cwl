@@ -152,7 +152,7 @@ steps:
       - output_indels_vcf_gz
 
 doc: |
-  Filters raw SNVs and Indels VCF files to retain high-confidence variants. |
+  Filters a raw SNV and Indel VCF file to retain high-confidence variants. |
   Step-1 filters: PASS calls; normalize and atomize variants; remove genomic regions; |
   Brain Somatic Mosaicism Network (BSMN) filter; remove clustered variants; run VEP and filter by allele frequency. |
   Splits the filtered variants into separate SNVs and Indels VCF files
