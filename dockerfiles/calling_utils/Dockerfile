@@ -111,6 +111,10 @@ RUN chmod +x filter_by_poe.py
 COPY scripts/filter_clustered_variants.py .
 RUN chmod +x filter_clustered_variants.py
 
+# tier_filter_variants_SR_PB_ONT.py
+COPY scripts/tier_filter_variants_SR_PB_ONT.py .
+RUN chmod +x tier_filter_variants_SR_PB_ONT.py
+
 #######################################################################
 #     Update env
 #######################################################################
