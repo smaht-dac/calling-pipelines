@@ -34,7 +34,7 @@ ENV LC_ALL=en_US.UTF-8
 #######################################################################
 ## Conda install
 #- pysam required by filter_by_poe.py
-RUN conda install -c bioconda -y pysam==0.21.0 && \
+RUN conda install -c bioconda -y pysam==0.21.0 scipy==1.10.1 && \
     conda clean -a -y -f
 
 ## granite
