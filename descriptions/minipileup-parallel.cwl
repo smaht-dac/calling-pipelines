@@ -71,7 +71,7 @@ inputs:
 
   - id: output_prefix
     type: string
-    default: "output"
+    default: "minipileup"
     inputBinding:
       prefix: -o
       position: 6

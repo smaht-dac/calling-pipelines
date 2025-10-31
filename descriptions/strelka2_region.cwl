@@ -60,7 +60,7 @@ inputs:
 
   - id: output_prefix
     type: string
-    default: output
+    default: "output"
     inputBinding:
       position: 6
       prefix: -o

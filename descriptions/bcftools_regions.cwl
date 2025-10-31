@@ -33,7 +33,7 @@ inputs:
 
   - id: output_prefix
     type: string
-    default: output
+    default: "regions"
     inputBinding:
       prefix: -o
     doc: Output file prefix

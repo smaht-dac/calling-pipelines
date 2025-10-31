@@ -22,7 +22,7 @@ inputs:
 
   - id: output_prefix
     type: string
-    default: output
+    default: "indexed"
     inputBinding:
       position: 2
     doc: Output file prefix

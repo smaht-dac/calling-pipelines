@@ -24,7 +24,7 @@ inputs:
 
   - id: output_file_name
     type: string
-    default: "output.vcf.gz"
+    default: "clustered.vcf.gz"
     inputBinding:
       position: 3
     doc: Output file in VCF format. Compressed with bgzip. |

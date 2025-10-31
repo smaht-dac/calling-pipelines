@@ -31,7 +31,7 @@ inputs:
 
   - id: output_file_name
     type: string
-    default: output.vcf
+    default: "filterTag.vcf"
     inputBinding:
       prefix: -o
     doc: Output file in VCF format

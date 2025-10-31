@@ -33,7 +33,7 @@ inputs:
 
   - id: output_prefix
     type: string
-    default: output
+    default: "pass_norm_dedup"
     inputBinding:
       prefix: -o
     doc: Output file prefix

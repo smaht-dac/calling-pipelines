@@ -32,7 +32,7 @@ inputs:
 
   - id: output_file_name
     type: string
-    default: "output.vcf.gz"
+    default: "tiered.vcf.gz"
     inputBinding:
       prefix: --output_vcf
     doc: Output VCF filename; use .vcf.gz to enable bgzip + tabix indexing

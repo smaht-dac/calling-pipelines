@@ -32,7 +32,7 @@ inputs:
 
   - id: output_prefix
     type: string
-    default: output
+    default: "pon"
     inputBinding:
       prefix: -o
     doc: Output file prefix
