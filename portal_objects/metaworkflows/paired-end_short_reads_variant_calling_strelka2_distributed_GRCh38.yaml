@@ -52,6 +52,12 @@ workflows:
   ############################################
   samtools_merge_cram:
 
+    ## Lock shards #####################
+    ####################################
+    shards: [["0"]]
+    # This is a bit of an hack, but to avoid issues with gathering the input for all the multiple sharded runs
+    # we need to define a single shard here, so to set the correct gathering behavior in the next step
+
     ## Specific arguments ##############
     ####################################
     input:
@@ -124,6 +130,7 @@ workflows:
         argument_type: file.cram
         source: samtools_merge_cram
         source_argument_name: output_file_cram
+        # Need to set gather input to set the dependency correctly from the single shard we run for samtools_merge_cram
         gather_input: 1
         # Since it works by region we mount the files
         mount: True
