@@ -124,6 +124,7 @@ workflows:
         argument_type: file.cram
         source: samtools_merge_cram
         source_argument_name: output_file_cram
+        gather_input: 1
         # Since it works by region we mount the files
         mount: True
 
