@@ -36,6 +36,7 @@ input:
 
   # Optional parameter inputs
   line_index:
+    # 1-based index of the region in the BED file to be processed
     argument_type: parameter.integer
 
   nthreads:
