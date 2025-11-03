@@ -22,8 +22,8 @@ input:
 
   input_normal_cram:
     argument_type: file.cram
-    # files:
-    #   - 
+    files:
+      - complete-reference-fasta-no-alt@GCA_000001405.15_GRCh38_no_decoy # Replace with normal sample CRAM, JUST FOR TESTING PURPOSES
 
   genome_reference_fasta:
     argument_type: file.fa
