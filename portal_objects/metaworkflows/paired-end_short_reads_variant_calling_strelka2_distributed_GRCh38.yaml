@@ -33,14 +33,13 @@ input:
   regions_bed_gz:
     argument_type: file.bed_gz
     files:
-      - strelka2-32regions-120M@GCA_000001405.15_GRCh38_no_decoy
+      - strelka2-33regions-chrM-120M@GCA_000001405.15_GRCh38_no_decoy
 
   # Optional parameter inputs
   region_index:
     # Need to be 1-based indices matching the number of regions in regions_bed_gz
     argument_type: parameter.array
-    value: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
-    # value: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32"]
+    value: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33]
 
 ## Workflows and dependencies ###############################
 #     Information for the workflows and their dependencies
@@ -59,6 +58,7 @@ workflows:
       # File arguments
       input_files_cram:
         argument_type: file.cram
+        mount: True
 
       genome_reference_fasta:
         argument_type: file.fa
@@ -107,7 +107,7 @@ workflows:
 
     ## Lock shards #####################
     ####################################
-    shards: [["0"], ["1"], ["2"], ["3"], ["4"], ["5"], ["6"], ["7"], ["8"], ["9"], ["10"], ["11"], ["12"], ["13"], ["14"], ["15"], ["16"], ["17"], ["18"], ["19"], ["20"], ["21"], ["22"], ["23"], ["24"], ["25"], ["26"], ["27"], ["28"], ["29"], ["30"], ["31"]]
+    shards: [["0"], ["1"], ["2"], ["3"], ["4"], ["5"], ["6"], ["7"], ["8"], ["9"], ["10"], ["11"], ["12"], ["13"], ["14"], ["15"], ["16"], ["17"], ["18"], ["19"], ["20"], ["21"], ["22"], ["23"], ["24"], ["25"], ["26"], ["27"], ["28"], ["29"], ["30"], ["31"], ["32"]]
     # These shards structure needs to match the number of regions in regions_bed_gz and defined by region_index
 
     ## Specific arguments ##############

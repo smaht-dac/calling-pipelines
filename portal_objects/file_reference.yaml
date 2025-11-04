@@ -182,3 +182,28 @@ type:
 # Required to enable sync with a reference bucket
 uuid: 89fbc2ef-21ca-4f3f-9934-e0f4673e7687
 accession: SMAFI4J5H6NQ
+
+---
+
+################################################################
+# Strelka2 genomic regions, GCA_000001405.15_GRCh38_no_decoy
+#  BED file of regions to be used with Strelka2 variant caller
+#  Each region is roughly 120M bases in size, 33 regions total
+#  !!! Includes chrM as separate region !!!
+################################################################
+name: strelka2-33regions-chrM-120M
+description: Genomic regions to run Strelka2 distributed variant calling. |
+             Each region spans roughly 120M bases. The genome is split into 33 regions. |
+             Includes chrM as separate region. |
+             Build hg38/GRCh38
+format: bed_gz
+version: GCA_000001405.15_GRCh38_no_decoy
+secondary_files:
+  - bed_gz_tbi
+category:
+  - Genome Region
+type:
+  - Sequence Interval
+# Required to enable sync with a reference bucket
+uuid: e202948c-d21b-4536-ae2b-b93d67653870
+accession: SMAFI485H1NA
