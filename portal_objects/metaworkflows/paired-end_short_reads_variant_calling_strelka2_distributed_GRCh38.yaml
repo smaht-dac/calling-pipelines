@@ -94,7 +94,7 @@ workflows:
         - m6a.xlarge
         - m7i.xlarge
         - m7a.xlarge
-      ebs_size: "3x"
+      ebs_size: "2.5x"
       ebs_optimized: True
       spot_instance: False
       run_name: run_samtools_merge_cram
