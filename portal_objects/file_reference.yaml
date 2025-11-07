@@ -207,3 +207,23 @@ type:
 # Required to enable sync with a reference bucket
 uuid: e202948c-d21b-4536-ae2b-b93d67653870
 accession: SMAFI485H1NA
+
+---
+
+################################################################
+# AluY_L1_SVA_cons_noPA, 252eaf3
+#  Consensus sequences for mobile element insertions (MEI)
+#  https://github.com/yangao07/longcallD/blob/main/anno/AluY_L1_SVA_cons_noPA.fa
+################################################################
+name: AluY-L1-SVA-cons-noPA
+description: Consensus sequences for mobile element insertions (MEI). |
+             Includes AluY, L1, and SVA elements
+format: fa
+version: 252eaf3
+category:
+  - Genome Annotation
+type:
+  - MEI
+# Required to enable sync with a reference bucket
+uuid: 3df7d2d5-3160-4f0a-a393-f60ef4126ccb
+accession: SMAFI8H5HQ1A
