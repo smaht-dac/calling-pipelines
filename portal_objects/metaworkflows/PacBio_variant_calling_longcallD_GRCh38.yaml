@@ -18,7 +18,7 @@ input:
   # File inputs
   input_file_cram:
     argument_type: file.cram
-    dimensionality: 1
+    dimensionality: 1 # TODO: need to remove this requirement from the schema for clarity since this will be a single file
 
   additional_input_files_cram:
     argument_type: file.cram
@@ -60,9 +60,6 @@ workflows:
       # File arguments
       input_file_cram:
         argument_type: file.cram
-        # It is always a single file we want to pass here
-        #  but the portal requires a list for file inputs so we need to subset
-        input_dimension: 1
 
       additional_input_files_cram:
         argument_type: file.cram
