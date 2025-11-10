@@ -86,7 +86,7 @@ workflows:
 
       # File output
       output_file_vcf_gz:
-        description: longcallD SNV output VCF
+        description: longcallD output VCF
         data_category:
           - Somatic Variant Calls
         data_type:
