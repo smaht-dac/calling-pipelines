@@ -3,7 +3,7 @@
 #############################################################
 name: PacBio_variant_calling_longcallD_GRCh38
 description: Run longcallD algorithm for somatic variant calling using PacBio long read data. |
-             Accepts a main CRAM file and optionally a list of additional CRAM files as input |
+             Accepts a main CRAM file and a list of additional CRAM files as input (required) |
              and produces final calls in VCF format
 
 category:
@@ -61,6 +61,7 @@ workflows:
       input_file_cram:
         argument_type: file.cram
         # It is always a single file we want to pass here
+        #  but the portal requires a list for file inputs so we need to subset
         input_dimension: 1
 
       additional_input_files_cram:
