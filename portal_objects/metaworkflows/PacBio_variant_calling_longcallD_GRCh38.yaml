@@ -18,7 +18,7 @@ input:
   # File inputs
   input_file_cram:
     argument_type: file.cram
-    dimensionality: 1 # TODO: need to remove this requirement from the schema for clarity since this will be a single file
+    dimensionality: 0
 
   additional_input_files_cram:
     argument_type: file.cram
