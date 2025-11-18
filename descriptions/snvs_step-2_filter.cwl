@@ -58,10 +58,29 @@ inputs:
     default: 100
     doc: Group size for interval batching
 
+  - id: germline_input_file_vcf_gz
+	type: File
+    secondaryFiles:
+      - .tbi
+    doc: Germline SNV calls input VCF (bgzipped) with .tbi index
+
+  - id: sample_id
+    type: string
+    doc: Output file prefix
+
+  - id: sex
+    type: string
+    doc: Donor sex (M/F)
+
+  - id: threads
+    type: int
+    doc: Number of cpus
+
+
 outputs:
   output_file_vcf_gz:
     type: File
-    outputSource: tier_filter_variants_SR_PB_ONT/output_file_vcf_gz
+    outputSource: phase_mosaic_snvs/output_file_vcf_gz
 
 steps:
   minipileup_parallel:
@@ -94,7 +113,26 @@ steps:
     out:
       - output_file_vcf_gz
 
+  phase_mosaic_snvs:
+	run: phase_mosaic_snvs.cwl
+	in:
+      input_file_vcf_gz:
+        source: input_file_vcf_gz
+	  germline_input_file_vcf_gz:
+		source: germline_input_file_vcf_gz
+      input_files_pb_cram:
+        source: input_files_pb_cram
+      sample_id:
+        source: sample_id 
+      sex:
+        source: sex 
+      threads:
+        source: threads 
+    out:
+      - output_file_vcf_gz
+	  
 doc: |
   Filters an SNV VCF file to retain high-confidence variants. |
   Step-2 filters: run minipileup using short-read and long-read CRAM files to compute read support for each SNV, |
-  then filter and tier based on read support, strand balance (Fisher) and germline deviation (binomial)
+  then filter and tier based on read support, strand balance (Fisher) and germline deviation (binomial) |
+  then phase/filter based on nearest germline variant

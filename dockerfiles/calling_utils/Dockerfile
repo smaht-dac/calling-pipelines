@@ -33,7 +33,7 @@ ENV LC_ALL=en_US.UTF-8
 #     Software
 #######################################################################
 ## Conda install
-#- pysam required by filter_by_poe.py
+#- pysam required by filter_by_poe.py, phasing_step2_phase_mosaic.py
 RUN conda install -c bioconda -y pysam==0.21.0 scipy==1.10.1 && \
     conda clean -a -y -f
 
@@ -102,6 +102,11 @@ RUN chmod +x split_snvs_indels.sh
 COPY minipileup-parallel.sh .
 RUN chmod +x minipileup-parallel.sh
 
+## phase_mosaic_vars
+COPY phase_mosaic_vars.sh .
+RUN chmod +x phase_mosaic_vars.sh
+
+
 ## scripts/
 # filter_by_poe.py
 COPY scripts/filter_by_poe.py .
@@ -114,6 +119,14 @@ RUN chmod +x filter_clustered_variants.py
 # tier_filter_variants_SR_PB_ONT.py
 COPY scripts/tier_filter_variants_SR_PB_ONT.py .
 RUN chmod +x tier_filter_variants_SR_PB_ONT.py
+
+# scripts/phasing_step1_get_closest_germline.sh
+COPY scripts/phasing_step1_get_closest_germline.sh .
+RUN chmod +x phasing_step1_get_closest_germline.sh
+
+# scripts/phasing_step2_phase_mosaic.py
+COPY scripts/phasing_step2_phase_mosaic.py .
+RUN chmod +x phasing_step2_phase_mosaic.py
 
 #######################################################################
 #     Update env
