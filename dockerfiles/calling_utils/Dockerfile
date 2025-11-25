@@ -106,7 +106,6 @@ RUN chmod +x minipileup-parallel.sh
 COPY phase_mosaic_vars.sh .
 RUN chmod +x phase_mosaic_vars.sh
 
-
 ## scripts/
 # filter_by_poe.py
 COPY scripts/filter_by_poe.py .
@@ -120,11 +119,11 @@ RUN chmod +x filter_clustered_variants.py
 COPY scripts/tier_filter_variants_SR_PB_ONT.py .
 RUN chmod +x tier_filter_variants_SR_PB_ONT.py
 
-# scripts/phasing_step1_get_closest_germline.sh
+# phasing_step1_get_closest_germline.sh
 COPY scripts/phasing_step1_get_closest_germline.sh .
 RUN chmod +x phasing_step1_get_closest_germline.sh
 
-# scripts/phasing_step2_phase_mosaic.py
+# phasing_step2_phase_mosaic.py
 COPY scripts/phasing_step2_phase_mosaic.py .
 RUN chmod +x phasing_step2_phase_mosaic.py
 

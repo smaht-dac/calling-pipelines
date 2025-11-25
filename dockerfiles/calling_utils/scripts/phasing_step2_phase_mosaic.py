@@ -8,10 +8,13 @@ from functools import partial
 from multiprocessing import cpu_count, set_start_method
 
 # ---------------------------------------------------------------
-# Parallel Step 5–7 (Sex-aware haplotype classification + phasing tag output)
+# Parallel Step (Sex-aware haplotype classification + phasing tag output)
 #   * Parallel per-variant row
 #   * Each worker opens its own BAMs (no shared state)  -> avoids race conditions
 #   * Parent writes outputs (single writer)             -> avoids race conditions
+#
+#  Note: this script assumes that the input somatic VCF only contains SNVs
+#        Indels should be removed prior to running this step
 # ---------------------------------------------------------------
 
 def get_base_at_pos(aln, chrom, pos):
@@ -26,14 +29,14 @@ def classify_row(row, bam_paths, sex):
     Worker: process a single TSV row (dict), open BAMs locally, and return the enriched row.
     This function is safe to run in parallel processes.
     """
-    # open BAMs per process to avoid shared handle issues
+    # Open BAMs per process to avoid shared handle issues
     bam_files = [pysam.AlignmentFile(b, "rb") for b in bam_paths]
     try:
         chrom = row["chrom"]
         var_pos = int(row["Var_pos"])
         germ_pos = row["Germ_pos"]
         if germ_pos == "NA":
-            row.update({k: "0" for k in ["case_both","case_germ_only","case_var_only","case_none","total_reads"]})
+            row.update({k: 0 for k in ["case_both","case_germ_only","case_var_only","case_none","total_reads"]})
             row["hap_classification"] = "no_germline"
             return row
 
@@ -74,18 +77,18 @@ def classify_row(row, bam_paths, sex):
         case_germ_only = counts.get("case_germ_only", 0)
 
         # Sex-specific chromosome logic
-        if sex == "male" or sex == 'M':
+        if sex == "male":
             # Haploid X/Y in males
             if chrom in ["chrX", "chrY"]:
                 if case_both > 1 and case_germ_only > 1 and case_none <= 1 and case_var_only <= 1: # 2 haplo
                     row["hap_classification"] = "mosaic"
-                if case_both > 1 and case_germ_only <= 1 and case_none <= 1 and case_var_only <= 1: # 1 haplo
+                elif case_both > 1 and case_germ_only <= 1 and case_none <= 1 and case_var_only <= 1: # 1 haplo
                     row["hap_classification"] = "germline"
                 else: # 3+ haplo
                     row["hap_classification"] = "artifact"
                 return row
 
-        elif sex == "female" or sex == 'F':
+        elif sex == "female":
             # Females: X diploid, Y = artifact
             if chrom == "chrY":
                 row["hap_classification"] = "artifact"
@@ -178,7 +181,7 @@ def main():
     indexed_rows = read_tsv_rows(args.tsv)
     if not indexed_rows:
         print("[Warn] Input TSV has no rows.")
-        # still emit empty outputs with headers
+        # still emit empty outputs
         with open(f"{args.id}.haplotyped.tsv", "w", newline="") as f_out:
             f_out.write("")  # nothing to write
         write_phasing_tags([], args.id)
@@ -222,8 +225,7 @@ def main():
     # Write phasing tags
     phasing_path = write_phasing_tags(results_buffer, args.id)
 
-
-        # --- Write debug intermediate file ---
+    # --- Write debug intermediate file ---
     debug_tsv = f"{args.id}.read_counts.phasing.tsv"
     debug_fields = [
         "chrom", "Var_pos", "Var_alt", "hap_classification",
@@ -246,7 +248,6 @@ def main():
             })
 
     print(f"[Done] Debug read count file: {debug_tsv}")
-
 
     print(f"[Done] Classification TSV: {out_tsv}")
     print(f"[Done] Phasing tags TSV: {phasing_path}")
