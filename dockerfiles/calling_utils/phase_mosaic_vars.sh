@@ -132,6 +132,15 @@ command -v phasing_step1_get_closest_germline.sh >/dev/null 2>&1 || { echo "Erro
 # Work directory
 #################################################################################
 
+# ---- Normalize all input paths to absolute paths ----
+# This avoids issues with temp directories and relative paths
+GERMLINE_VCF="$(readlink -f "$GERMLINE_VCF")"
+INPUT_VCF="$(readlink -f "$INPUT_VCF")"
+for i in "${!PB_CRAMS[@]}"; do
+  PB_CRAMS[$i]="$(readlink -f "${PB_CRAMS[$i]}")"
+done
+
+# ---- Create work directory ----
 WORKDIR="$(mktemp -d phasing_pipeline.XXXXXX)"
 trap 'rm -rf "$WORKDIR"' EXIT
 
@@ -144,7 +153,7 @@ ANNOTATED_VCF="${SAMPLE_ID}.annotated.vcf.gz"
 FINAL_VCF="${SAMPLE_ID}.phased.vcf.gz"
 
 #################################################################################
-# STEP 4 – long-read phasing tag generation
+# Long-read phasing tag generation
 #################################################################################
 
 echo "------------------------------------------------------------"
@@ -163,7 +172,7 @@ echo "------------------------------------------------------------"
 [[ -s "$STEP4_TSV" ]] || { echo "Error: Step4 TSV is empty"; exit 1; }
 
 #################################################################################
-# STEP 5 – long-read haplotype classification
+# Long-read haplotype classification
 #################################################################################
 
 echo "------------------------------------------------------------"
