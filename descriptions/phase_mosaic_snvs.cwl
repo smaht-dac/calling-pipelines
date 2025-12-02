@@ -52,11 +52,11 @@ inputs:
 
   - id: sex
     type: string
-    default: "M"
+    default: "unknown"
     inputBinding:
       prefix: -s
       position: 5
-    doc: Donor sex (M/F)
+    doc: Donor sex (male, female, unknown)
 
   - id: threads
     type: int
@@ -64,7 +64,7 @@ inputs:
     inputBinding:
       prefix: -t
       position: 6
-    doc: Number of cpus
+    doc: Number of threads to use
 
 outputs:
   - id: output_file_vcf_gz
@@ -76,5 +76,5 @@ outputs:
     doc: Compressed VCF with index
 
 doc: |
-  Run phasing on tiered variants using PacBio CRAM files.
+  Run phasing on tiered variants using PacBio CRAM files. |
   Outputs a compressed VCF with index

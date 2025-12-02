@@ -14,6 +14,12 @@ inputs:
       - .tbi
     doc: Input VCF (bgzipped) with .tbi index
 
+  - id: germline_input_file_vcf_gz
+    type: File
+    secondaryFiles:
+      - .tbi
+    doc: Germline SNV calls input VCF (bgzipped) with .tbi index
+
   - id: genome_reference_fasta
     type: File
     secondaryFiles:
@@ -48,6 +54,10 @@ inputs:
       - .crai
     doc: ONT CRAM files (with .crai)
 
+  - id: sample_id
+    type: string
+    doc: Output file prefix
+
   - id: additional_args
     type: string
     default: "-c -C -Q 20 -q 30 -s 0"
@@ -58,24 +68,13 @@ inputs:
     default: 100
     doc: Group size for interval batching
 
-  - id: germline_input_file_vcf_gz
-	type: File
-    secondaryFiles:
-      - .tbi
-    doc: Germline SNV calls input VCF (bgzipped) with .tbi index
-
-  - id: sample_id
-    type: string
-    doc: Output file prefix
-
   - id: sex
     type: string
-    doc: Donor sex (M/F)
+    doc: Donor sex (male, female, unknown)
 
   - id: threads
     type: int
-    doc: Number of cpus
-
+    doc: Number of threads to use
 
 outputs:
   output_file_vcf_gz:
@@ -114,12 +113,12 @@ steps:
       - output_file_vcf_gz
 
   phase_mosaic_snvs:
-	run: phase_mosaic_snvs.cwl
-	in:
+    run: phase_mosaic_snvs.cwl
+    in:
       input_file_vcf_gz:
-        source: input_file_vcf_gz
-	  germline_input_file_vcf_gz:
-		source: germline_input_file_vcf_gz
+        source: tier_filter_variants_SR_PB_ONT/output_file_vcf_gz
+      germline_input_file_vcf_gz:
+        source: germline_input_file_vcf_gz
       input_files_pb_cram:
         source: input_files_pb_cram
       sample_id:
@@ -130,9 +129,9 @@ steps:
         source: threads 
     out:
       - output_file_vcf_gz
-	  
+
 doc: |
   Filters an SNV VCF file to retain high-confidence variants. |
   Step-2 filters: run minipileup using short-read and long-read CRAM files to compute read support for each SNV, |
-  then filter and tier based on read support, strand balance (Fisher) and germline deviation (binomial) |
+  then filter and tier based on read support, strand balance (Fisher) and germline deviation (binomial), |
   then phase/filter based on nearest germline variant
