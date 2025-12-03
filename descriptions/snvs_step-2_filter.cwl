@@ -54,10 +54,6 @@ inputs:
       - .crai
     doc: ONT CRAM files (with .crai)
 
-  - id: sample_id
-    type: string
-    doc: Output file prefix
-
   - id: additional_args
     type: string
     default: "-c -C -Q 20 -q 30 -s 0"
@@ -121,8 +117,6 @@ steps:
         source: germline_input_file_vcf_gz
       input_files_pb_cram:
         source: input_files_pb_cram
-      sample_id:
-        source: sample_id 
       sex:
         source: sex 
       threads:
