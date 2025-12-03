@@ -75,6 +75,17 @@ RUN make
 WORKDIR /usr/local/bin/
 RUN ln -s minipileup-1.4b minipileup
 
+## Bedtools install
+RUN wget https://github.com/arq5x/bedtools2/releases/download/v2.31.1/bedtools-2.31.1.tar.gz && \
+    tar -xzf bedtools-2.31.1.tar.gz && \
+    rm -rf bedtools-2.31.1.tar.gz
+
+WORKDIR /usr/local/bin/bedtools2
+RUN make
+
+WORKDIR /usr/local/bin/
+RUN ln -s bedtools2 bedtools
+
 #######################################################################
 #     Scripts
 #######################################################################
@@ -134,5 +145,6 @@ ENV PATH=/usr/local/bin/:$PATH
 ENV PATH=/usr/local/bin/samtools/:$PATH
 ENV PATH=/usr/local/bin/bcftools/:$PATH
 ENV PATH=/usr/local/bin/minipileup/:$PATH
+ENV PATH=/usr/local/bin/bedtools/bin/:$PATH
 
 CMD ["bash"]
