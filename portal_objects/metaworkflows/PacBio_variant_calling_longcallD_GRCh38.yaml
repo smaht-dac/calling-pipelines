@@ -94,7 +94,7 @@ workflows:
         output_status: Final Output
         # These fields are required to link metadata for the naming
         software:
-          - smaht:Software-longcallD_v0.0.6
+          - smaht:Software-longcallD_v0.0.7
         reference_genome: GRCh38
 
     ## EC2 Configuration to use ########
