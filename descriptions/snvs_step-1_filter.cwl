@@ -78,11 +78,21 @@ steps:
     out:
       - output_file_vcf_gz
 
+  filter_clustered_variants:
+    run: filter_clustered_variants.cwl
+    in:
+      input_file_vcf_gz:
+        source: bcftools_PASS_norm_dedup/output_file_vcf_gz
+      window_size:
+        source: window_size
+    out:
+      - output_file_vcf_gz
+
   bcftools_regions:
     run: bcftools_regions.cwl
     in:
       input_file_vcf_gz:
-        source: bcftools_PASS_norm_dedup/output_file_vcf_gz
+        source: filter_clustered_variants/output_file_vcf_gz
       input_files_bed:
         source: input_files_bed
     out:
@@ -98,21 +108,11 @@ steps:
     out:
       - output_file_vcf_gz
 
-  filter_clustered_variants:
-    run: filter_clustered_variants.cwl
-    in:
-      input_file_vcf_gz:
-        source: filter_panel_errors/output_file_vcf_gz
-      window_size:
-        source: window_size
-    out:
-      - output_file_vcf_gz
-
   vep_parallel:
     run: vep-parallel.cwl
     in:
       input_file_vcf_gz:
-        source: filter_clustered_variants/output_file_vcf_gz
+        source: filter_panel_errors/output_file_vcf_gz
       regions_list_txt:
         source: regions_list_txt
       vep_database_archive:
@@ -140,7 +140,7 @@ steps:
       input_file_vcf:
         source: granite_filterByTag/output_file_vcf
     out:
-      -  output_file_vcf_gz
+      - output_file_vcf_gz
 
   split_snvs_indels:
     run: split_snvs_indels.cwl

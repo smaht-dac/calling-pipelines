@@ -210,10 +210,10 @@ tabix "$ANNOTATED_VCF"
 # Filter for passing variants
 #################################################################################
 
-echo "Filtering variants for TIER2 / interesting phasing categories..."
+echo "Filtering variants for SR-only / interesting phasing categories..."
 
 bcftools view \
-  -i '(FILTER="TIER2") || (INFO/PHASING="MOSAIC_PHASED") || (INFO/PHASING="UNABLE_TO_PHASE")' \
+  -i '(INFO/CrossTech=0) || (INFO/PHASING="MOSAIC_PHASED") || (INFO/PHASING="UNABLE_TO_PHASE")' \
   "$ANNOTATED_VCF" \
   -Oz -o "$FINAL_VCF"
 
