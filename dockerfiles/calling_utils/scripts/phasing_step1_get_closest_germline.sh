@@ -27,7 +27,7 @@ done
 [[ -z ${SAMPLE-} || -z ${GERMLINE_VCF-} || -z ${SOMATIC_VCF-} ]] && { usage; exit 1; }
 
 # ---- File paths ----
-TIER1_VCF="tier1.norm.vcf.gz"
+CROSSTECH_VCF="CROSSTECH.norm.vcf.gz"
 SOMATIC_BED="${SAMPLE}.somatic_sites.bed"
 SOMATIC_5KB="${SAMPLE}.somatic_5kb.bed"
 GERM_SUBVCF="${SAMPLE}.germline.subset.vcf.gz"
@@ -37,13 +37,13 @@ MAP_TSV="${SAMPLE}.germline_map.tsv"
 FAILED_TSV="${SAMPLE}.no_close_germline.tsv"
 
 # ---- 1. Extract somatic TIER1 variants ----
-echo "Extracting TIER1 somatic variants..."
-bcftools view -i 'FILTER=="TIER1"' -Oz -o "$TIER1_VCF" "$SOMATIC_VCF"
-tabix -f "$TIER1_VCF"
+echo "Extracting CrossTech somatic variants..."
+bcftools view -i 'INFO/CrossTech=1' -Oz -o "$CROSSTECH_VCF" "$SOMATIC_VCF"
+tabix -f "$CROSSTECH_VCF"
 
 # ---- 2. Convert TIER1 VCF to BED ----
 echo "Converting TIER1 VCF to BED..."
-bcftools query -f'%CHROM\t%POS0\t%POS\t%REF\t%ALT\n' "$TIER1_VCF" \
+bcftools query -f'%CHROM\t%POS0\t%POS\t%REF\t%ALT\n' "$CROSSTECH_VCF" \
   | sort -k1,1 -k2,2n -S1G > "$SOMATIC_BED"
 
 # ---- 3. Make ±5 kb windows around TIER1 variants ----
