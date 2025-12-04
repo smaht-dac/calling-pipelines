@@ -24,13 +24,21 @@ def get_base_at_pos(aln, chrom, pos):
             return aln.query_sequence[qpos]
     return None
 
-def classify_row(row, bam_paths, sex):
+def classify_row(row, bam_paths, sex, reference_path):
     """
     Worker: process a single TSV row (dict), open BAMs locally, and return the enriched row.
     This function is safe to run in parallel processes.
     """
     # Open BAMs per process to avoid shared handle issues
-    bam_files = [pysam.AlignmentFile(b, "rb") for b in bam_paths]
+    bam_files = []
+    for b in bam_paths:
+        if b.endswith('.cram'):
+            bam_files.append(pysam.AlignmentFile(b, 'rc', reference_filename=reference_path))
+        elif b.endswith('.bam'):
+            bam_files.append(pysam.AlignmentFile(b, "rb"))
+        else:
+            raise ValueError(f'ERROR: {b} extension not recognized. Expected .bam or .cram')
+
     try:
         chrom = row["chrom"]
         var_pos = int(row["Var_pos"])
@@ -115,6 +123,7 @@ def classify_row(row, bam_paths, sex):
             row["hap_classification"] = "artifact"
 
         return row
+
     finally:
         for bam in bam_files:
             bam.close()
@@ -164,8 +173,9 @@ def main():
     parser = argparse.ArgumentParser(
         description="Phasing step: parallel read-level haplotype analysis, classification, and tag output."
     )
-    parser.add_argument("-t", "--tsv", required=True, help="TSV from Step 4")
-    parser.add_argument("-b", "--bams", nargs="+", required=True, help="PacBio BAMs")
+    parser.add_argument("-t", "--tsv", required=True, help="TSV with closest germline (from phasing_step1_get_closest_germline.sh)")
+    parser.add_argument("-b", "--bams", nargs="+", required=True, help="PacBio BAM or CRAM files")
+    parser.add_argument("-r", "--reference", required=True, help="Reference FASTA")
     parser.add_argument("-s", "--sex", default="unknown",
                         choices=["male", "female", "unknown"],
                         help="Sex of the sample (for haploid X/Y logic)")
@@ -188,7 +198,7 @@ def main():
         return
 
     # Prepare worker function (top-level, pickleable)
-    worker = partial(classify_row, bam_paths=args.bams, sex=args.sex)
+    worker = partial(classify_row, bam_paths=args.bams, sex=args.sex, reference_path=args.reference)
 
     # Submit in parallel; collect as (idx, enriched_row)
     results_buffer = [None] * len(indexed_rows)
@@ -254,4 +264,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

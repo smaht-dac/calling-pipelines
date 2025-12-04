@@ -24,6 +24,7 @@ Usage: $0 \\
     -v GERMLINE_VCF \\
     -w INPUT_VCF \\
     -s SEX \\
+    -r REFERENCE_FASTA \\
     [--pb-cram CRAM ...] \\
     [-t THREADS]
 
@@ -32,12 +33,13 @@ Required arguments:
     -v          Germline VCF
     -w          Input mosaic VCF (SNV VCF)
     -s          Sex: "male", "female", "unknown"
+    -r          Reference FASTA
     --pb-cram   PacBio long-read CRAM with .crai file, also accept BAM with .bai or .csi index (repeatable)
 
     -t          Threads for phasing_step2_phase_mosaic.py
 
 Example:
-    $0 -i SMHT005 -v SMHT005_germline.vcf.gz -w SMHT005-3A_mosaic.vcf.gz --pb-cram a.bam --pb-cram b.bam -s male -t 8
+    $0 -i SMHT005 -v SMHT005_germline.vcf.gz -w SMHT005-3A_mosaic.vcf.gz --pb-cram a.bam --pb-cram b.bam -r reference.fasta -s male -t 8
 
 EOF
   exit 1
@@ -51,6 +53,7 @@ SAMPLE_ID=""
 GERMLINE_VCF=""
 INPUT_VCF=""
 SEX=""
+REFERENCE=""
 THREADS="$(nproc)"
 
 PB_CRAMS=()
@@ -65,6 +68,7 @@ while [[ $# -gt 0 ]]; do
     -v) GERMLINE_VCF="$2"; shift 2;;
     -w) INPUT_VCF="$2"; shift 2;;
     -s) SEX="$2"; shift 2;;
+    -r) REFERENCE="$2"; shift 2;;
     -t) THREADS="$2"; shift 2;;
 
     --pb-cram) PB_CRAMS+=("$2"); shift 2;;
@@ -84,11 +88,13 @@ done
 [[ -n "$SEX" ]]            || { echo "Error: -s SEX is required"; usage; }
 
 [[ "$THREADS" =~ ^[0-9]+$ ]] || { echo "Error: THREADS (-t) must be integer"; exit 1; }
+(( THREADS > 0 )) || { echo "Error: THREADS (-t) must be > 0"; exit 1; }
 
 [[ -f "$GERMLINE_VCF" ]] || { echo "Error: Germline VCF not found: $GERMLINE_VCF"; exit 1; }
 [[ -f "$INPUT_VCF" ]]    || { echo "Error: Input VCF not found: $INPUT_VCF"; exit 1; }
 
-
+[[ -f "$REFERENCE" ]]    || { echo "Error: Input reference FASTA not found: $REFERENCE"; exit 1; }
+[[ -f "${REFERENCE}.fai" ]] || { echo "Error: Reference FASTA index not found: ${REFERENCE}.fai"; exit 1; }
 
 # CRAM/BAM checks (index check too)
 if (( ${#PB_CRAMS[@]} == 0 )); then
@@ -129,28 +135,18 @@ command -v phasing_step2_phase_mosaic.py >/dev/null 2>&1 || { echo "Error: phasi
 command -v phasing_step1_get_closest_germline.sh >/dev/null 2>&1 || { echo "Error: phasing_step1_get_closest_germline.sh not found in PATH"; exit 1; }
 
 #################################################################################
-# Work directory
+# Output / intermediate files
 #################################################################################
 
-# ---- Normalize all input paths to absolute paths ----
-# This avoids issues with temp directories and relative paths
-GERMLINE_VCF="$(readlink -f "$GERMLINE_VCF")"
-INPUT_VCF="$(readlink -f "$INPUT_VCF")"
-for i in "${!PB_CRAMS[@]}"; do
-  PB_CRAMS[$i]="$(readlink -f "${PB_CRAMS[$i]}")"
-done
-
-# ---- Create work directory ----
-WORKDIR="$(mktemp -d phasing_pipeline.XXXXXX)"
-trap 'rm -rf "$WORKDIR"' EXIT
-
-echo "Workdir: $WORKDIR"
-
-STEP4_TSV="${WORKDIR}/${SAMPLE_ID}.germline_map.tsv"
-TAGS_TXT="${WORKDIR}/${SAMPLE_ID}_phasing_tags.tsv"
+# ---- File names ----
+STEP4_TSV="${SAMPLE_ID}.germline_map.tsv"
+TAGS_TXT="${SAMPLE_ID}_phasing_tags.tsv"
 TAGS_GZ="${TAGS_TXT}.gz"
 ANNOTATED_VCF="${SAMPLE_ID}.annotated.vcf.gz"
 FINAL_VCF="${SAMPLE_ID}.phased.vcf.gz"
+
+# ---- Trap to clean intermediate files  ----
+trap "rm -f '$STEP4_TSV' '$TAGS_TXT' '$TAGS_GZ'" EXIT
 
 #################################################################################
 # Long-read phasing tag generation
@@ -160,16 +156,12 @@ echo "------------------------------------------------------------"
 echo "Running phasing_step1_get_closest_germline.sh"
 echo "------------------------------------------------------------"
 
-(
-  cd "$WORKDIR"
-  phasing_step1_get_closest_germline.sh \
-      -s "$SAMPLE_ID" \
-      -v "$GERMLINE_VCF" \
-      -w "$INPUT_VCF"
-)
+phasing_step1_get_closest_germline.sh \
+    -s "$SAMPLE_ID" \
+    -v "$GERMLINE_VCF" \
+    -w "$INPUT_VCF"
 
-# generates "${WORKDIR}/${SAMPLE_ID}.germline_map.tsv" (STEP4_TSV)
-[[ -s "$STEP4_TSV" ]] || { echo "Error: Step4 TSV is empty"; exit 1; }
+[[ -s "$STEP4_TSV" ]] || { echo "Error: closest germline TSV is empty"; exit 1; }
 
 #################################################################################
 # Long-read haplotype classification
@@ -180,15 +172,13 @@ echo "Running phasing_step2_phase_mosaic.py"
 echo "------------------------------------------------------------"
 
 # -b is a multi-arg, ie: -b bam1.bam  bam2.bam
-(
-  cd "$WORKDIR"
-  phasing_step2_phase_mosaic.py \
-      --workers "$THREADS" \
-      --tsv "$STEP4_TSV" \
-      -b "${PB_CRAMS[@]}" \
-      -s "$SEX" \
-      -i "$SAMPLE_ID"
-)
+phasing_step2_phase_mosaic.py \
+    --workers "$THREADS" \
+    --tsv "$STEP4_TSV" \
+    --reference "$REFERENCE" \
+    -b "${PB_CRAMS[@]}" \
+    -s "$SEX" \
+    -i "$SAMPLE_ID"
 
 [[ -f "$TAGS_TXT" ]] || { echo "Error: phasing tags not produced"; exit 1; }
 

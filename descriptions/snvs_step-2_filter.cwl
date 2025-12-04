@@ -115,6 +115,8 @@ steps:
         source: tier_filter_variants_SR_PB_ONT/output_file_vcf_gz
       germline_input_file_vcf_gz:
         source: germline_input_file_vcf_gz
+      genome_reference_fasta:
+        source: genome_reference_fasta
       input_files_pb_cram:
         source: input_files_pb_cram
       sex:

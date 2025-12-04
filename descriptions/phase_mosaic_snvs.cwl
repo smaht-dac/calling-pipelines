@@ -29,6 +29,16 @@ inputs:
       - .tbi
     doc: Germline SNV calls input VCF (bgzipped) with .tbi index
 
+  - id: genome_reference_fasta
+    type: File
+    inputBinding:
+      prefix: -r
+      position: 3
+    secondaryFiles:
+      - ^.dict
+      - .fai
+    doc: Reference FASTA with index files
+
   - id: input_files_pb_cram
     type:
       -
@@ -39,7 +49,7 @@ inputs:
     secondaryFiles:
       - .crai
     inputBinding:
-      position: 3
+      position: 4
     doc: PacBio CRAM files (with .crai)
 
   - id: sample_id
@@ -47,7 +57,7 @@ inputs:
     default: "sample"
     inputBinding:
       prefix: -i
-      position: 4
+      position: 5
     doc: Output file prefix
 
   - id: sex
@@ -55,7 +65,7 @@ inputs:
     default: "unknown"
     inputBinding:
       prefix: -s
-      position: 5
+      position: 6
     doc: Donor sex (male, female, unknown)
 
   - id: threads
@@ -63,7 +73,7 @@ inputs:
     default: 1 
     inputBinding:
       prefix: -t
-      position: 6
+      position: 7
     doc: Number of threads to use
 
 outputs:
