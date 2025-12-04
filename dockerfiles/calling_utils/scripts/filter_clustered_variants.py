@@ -2,7 +2,7 @@
 import argparse
 import pysam
 
-def filter_clustered(input_vcf, output_vcf, window=100):
+def filter_clustered(input_vcf, output_vcf, window=50):
     vcf_in = pysam.VariantFile(input_vcf)
     vcf_out = pysam.VariantFile(output_vcf, "w", header=vcf_in.header)
 
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Remove clustered variants (SNVs + indels) within N bp")
     parser.add_argument("input_vcf", help="Input VCF file (bgzipped or not)")
     parser.add_argument("output_vcf", help="Output VCF file (will be bgzipped if ends with .gz)")
-    parser.add_argument("--window", type=int, default=100, help="Window size in bp [default=100]")
+    parser.add_argument("--window", type=int, default=50, help="Window size in bp [default=50]")
     args = parser.parse_args()
 
     filter_clustered(args.input_vcf, args.output_vcf, args.window)
