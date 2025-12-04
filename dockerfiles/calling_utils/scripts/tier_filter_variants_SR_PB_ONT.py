@@ -485,7 +485,8 @@ class TieredVCF:
                     if len(callers_value) > 1:
                         record.info['CrossCaller'] = True
 
-                    record.info["CALLERS"] = callers_value
+                    if keep_info == False:
+                        record.info["CALLERS"] = callers_value
                     # Add raw counts to INFO fields
                     agg = self.minipileup_vcf.aggregate_counts[key]
                     record.info["SR_ADF"] = [agg["SR"].REF_ADF, agg["SR"].ALT_ADF]
