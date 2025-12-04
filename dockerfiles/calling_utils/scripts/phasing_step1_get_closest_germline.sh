@@ -2,9 +2,9 @@
 set -euo pipefail
 
 # ---------------------------------------------------------------
-#  Map filtered germline VCF to TIER1 sites
+#  Map filtered germline VCF to CrossTech sites
 #   Input: filtered germline VCF (AF > 0.001) and somatic VCF
-#   Output: final mapping table linking each TIER1 variant
+#   Output: final mapping table linking each CrossTech variant
 #            to the *closest* germline variant (within ±5 kb)
 #
 #  Note: this script assumes that the input somatic VCF only contains SNVs
@@ -36,23 +36,23 @@ CLOSEST="${SAMPLE}.closest.tsv"
 MAP_TSV="${SAMPLE}.germline_map.tsv"
 FAILED_TSV="${SAMPLE}.no_close_germline.tsv"
 
-# ---- 1. Extract somatic TIER1 variants ----
+# ---- 1. Extract somatic CrossTech variants ----
 echo "Extracting CrossTech somatic variants..."
 bcftools view -i 'INFO/CrossTech=1' -Oz -o "$CROSSTECH_VCF" "$SOMATIC_VCF"
 tabix -f "$CROSSTECH_VCF"
 
-# ---- 2. Convert TIER1 VCF to BED ----
-echo "Converting TIER1 VCF to BED..."
+# ---- 2. Convert CrossTech VCF to BED ----
+echo "Converting CrossTech VCF to BED..."
 bcftools query -f'%CHROM\t%POS0\t%POS\t%REF\t%ALT\n' "$CROSSTECH_VCF" \
   | sort -k1,1 -k2,2n -S1G > "$SOMATIC_BED"
 
-# ---- 3. Make ±5 kb windows around TIER1 variants ----
-echo "Creating ±5 kb windows around TIER1 sites..."
+# ---- 3. Make ±5 kb windows around CrossTech variants ----
+echo "Creating ±5 kb windows around CrossTech sites..."
 awk 'BEGIN{OFS="\t"}{s=$2-5000; if(s<0)s=0; e=$3+5000; print $1,s,e}' "$SOMATIC_BED" \
   | bedtools merge -i - > "$SOMATIC_5KB"
 
 # ---- 4. Subset germline VCF to these regions ----
-echo "Subsetting germline VCF to ±5 kb around TIER1 sites..."
+echo "Subsetting germline VCF to ±5 kb around CrossTech sites..."
 bcftools view \
   -v snps \
   -R "$SOMATIC_5KB" \
@@ -72,7 +72,7 @@ awk 'NR==FNR{a[$1":"$3":"$4":"$5]; next}
      !($1":"$3":"$4":"$5 in a)' "$SOMATIC_BED" "$GERM_BED" > "${GERM_BED%.bed}.filtered.bed"
 
 # Step 6b. Find closest (now guaranteed non-identical)
-echo "Finding closest germline variants to each TIER1 somatic variant..."
+echo "Finding closest germline variants to each CrossTech somatic variant..."
 bedtools closest -a "$SOMATIC_BED" -b "${GERM_BED%.bed}.filtered.bed" -d > "$CLOSEST"
 
 # ---- 7. Split pass / fail by distance ----

@@ -41,7 +41,7 @@ def get_read_cutoffs(SR_cov: int, PB_cov: int,
     error_rate : float, optional
         Sequencing error rate (default = 0.001)
     target_p : float, optional
-        Target probability for random error (default = 1e-3)
+        Target probability for random error (default = 1e-2)
 
     Returns
     -------
@@ -423,7 +423,7 @@ class TieredVCF:
         elif chrom in ("M", "MT"): return 25
         else: return int(chrom) if chrom.isdigit() else 26
 
-    def write_tiered_vcf(self, out_vcf_path: str, keep_VEP=False):
+    def write_tiered_vcf(self, out_vcf_path: str, keep_info: bool=False):
         """Write tiered VCF to out_vcf_path.
         """
         no_pileup_counts, fail_filters = 0, 0
@@ -431,7 +431,7 @@ class TieredVCF:
         with pysam.VariantFile(self.original_vcf.vcf_path) as vf_in:
 
             header = vf_in.header.copy()
-            
+
             for definition in self.definitions:
                 header.add_line(definition)
 
@@ -445,7 +445,7 @@ class TieredVCF:
                     # Extract CALLERS (if present) then remove all INFO fields from original vcf
                     callers_value = record.info.get("CALLERS")
 
-                    if keep_VEP == False:
+                    if keep_info == False:
                         # Clear all INFO fields
                         record.info.clear()
   
@@ -542,8 +542,8 @@ if __name__ == "__main__":
                     help="Min ALT reads for PB (PacBio) to use PB counts for the strand test (default: 2)")
     parser.add_argument("--min_alt_binom", type=int, default=1,
                     help="Min ALT reads required to run the binomial test (default: 1)")
-    parser.add_argument("--keep_vep", action='store_true',
-                    help="Keep VEP annotation in INFO field")
+    parser.add_argument("--keep_info", action='store_true',
+                    help="Keep existing INFO annotations")
 
     args = parser.parse_args()
 
@@ -557,7 +557,7 @@ if __name__ == "__main__":
         min_alt_PB=args.min_alt_PB,
         min_alt_binom=args.min_alt_binom,
     )
-    tvcf.write_tiered_vcf(args.output_vcf, args.keep_vep)
+    tvcf.write_tiered_vcf(args.output_vcf, args.keep_info)
 
     if args.output_vcf.endswith(".vcf.gz"):
         pysam.tabix_index(args.output_vcf, preset="vcf", force=True)
