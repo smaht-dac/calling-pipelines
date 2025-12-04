@@ -435,9 +435,6 @@ class TieredVCF:
             for definition in self.definitions:
                 header.add_line(definition)
 
-            # Add source and fileDate
-            header.add_line('##source=tier_filter_variants_SR_PB_ONT.py')
-            header.add_line(f'##fileDate={datetime.now().strftime("%Y%m%d")}')
             with pysam.VariantFile(out_vcf_path, "w", header=header) as vf_out:
                 for key in sorted(self.snvs, key=lambda k: (self.chrom_order(k[0]), k[1])):
                     if key not in self.minipileup_vcf.aggregate_counts:
