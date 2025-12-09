@@ -138,6 +138,10 @@ RUN chmod +x phasing_step1_get_closest_germline.sh
 COPY scripts/phasing_step2_phase_mosaic.py .
 RUN chmod +x phasing_step2_phase_mosaic.py
 
+# merge_callers.py
+COPY scripts/merge_callers.py .
+RUN chmod +x merge_callers.py
+
 #######################################################################
 #     Update env
 #######################################################################
