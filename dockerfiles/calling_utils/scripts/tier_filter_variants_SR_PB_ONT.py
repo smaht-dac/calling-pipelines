@@ -149,11 +149,21 @@ class MinipileupVCF:
         return the index of the ALT allele in the record.alts tuple.
         Try to match exactly first, then by first base only.
         If not found, return None.
+
+        Check length of ref to make sure alt match is accurate. Example:
+            orig vcf:
+                G>A
+            minipileup vcf:
+                GNN -> AN, ANN, A
+            Should select second alt allele
         """
+        l_ref = len(record.ref)
         for i, alt in enumerate(record.alts):
             if alt == ALT: return i
         for i, alt in enumerate(record.alts):
-            if alt[0] == ALT: return i
+            l_alt = len(alt)
+            if l_ref == l_alt:
+                if alt[0] == ALT: return i
         return None
 
     def add_counts(self, record: pysam.VariantRecord, sample: str, ALT_index: int):
