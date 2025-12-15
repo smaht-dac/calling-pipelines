@@ -163,7 +163,9 @@ class MinipileupVCF:
         for i, alt in enumerate(record.alts):
             l_alt = len(alt)
             if l_ref == l_alt:
-                if alt[0] == ALT: return i
+                alt_no_N = alt.strip('N') 
+                # takes care of cases with TNN > ACN,ANN
+                if alt_no_N == ALT: return i
         return None
 
     def add_counts(self, record: pysam.VariantRecord, sample: str, ALT_index: int):
