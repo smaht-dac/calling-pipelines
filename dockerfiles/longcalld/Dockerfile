@@ -45,11 +45,11 @@ WORKDIR /usr/local/bin/
 RUN ln -s samtools-1.17 samtools
 
 ## longcallD install
-RUN wget https://github.com/yangao07/longcallD/releases/download/v0.0.7/longcallD-v0.0.7_x64-linux.tar.gz && \
-    tar -zxvf longcallD-v0.0.7_x64-linux.tar.gz && \
-    rm -rf longcallD-v0.0.7_x64-linux.tar.gz
+RUN wget https://github.com/yangao07/longcallD/releases/download/v0.0.8/longcallD-v0.0.8_x64-linux.tar.gz && \
+    tar -zxvf longcallD-v0.0.8_x64-linux.tar.gz && \
+    rm -rf longcallD-v0.0.8_x64-linux.tar.gz
 
-RUN ln -s longcallD-v0.0.7_x64-linux longcallD
+RUN ln -s longcallD-v0.0.8_x64-linux longcallD
 
 #######################################################################
 #     Update env

@@ -13,7 +13,7 @@ runner:
     - compress_index_vcf.cwl
 
 software:
-  - longcallD@v0.0.7
+  - longcallD@v0.0.8
   - Samtools@1.17
 
 category:

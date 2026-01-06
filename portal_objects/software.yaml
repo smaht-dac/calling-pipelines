@@ -48,10 +48,10 @@ code: strelka2
 ---
 
 ################################################################
-# longcallD, v0.0.7
+# longcallD, v0.0.8
 ################################################################
 name: longcallD
-version: 'v0.0.7'
+version: 'v0.0.8'
 source_url: https://github.com/yangao07/longcallD
 category:
   - Variant Calling
