@@ -33,7 +33,7 @@ ENV LC_ALL=en_US.UTF-8
 #     Software
 #######################################################################
 ## Conda install
-#- pysam required by filter_by_poe.py
+#- pysam required by filter_by_poe.py, phasing_step2_phase_mosaic.py
 RUN conda install -c bioconda -y pysam==0.21.0 scipy==1.10.1 && \
     conda clean -a -y -f
 
@@ -75,6 +75,17 @@ RUN make
 WORKDIR /usr/local/bin/
 RUN ln -s minipileup-1.4b minipileup
 
+## Bedtools install
+RUN wget https://github.com/arq5x/bedtools2/releases/download/v2.31.1/bedtools-2.31.1.tar.gz && \
+    tar -xzf bedtools-2.31.1.tar.gz && \
+    rm -rf bedtools-2.31.1.tar.gz
+
+WORKDIR /usr/local/bin/bedtools2
+RUN make
+
+WORKDIR /usr/local/bin/
+RUN ln -s bedtools2 bedtools
+
 #######################################################################
 #     Scripts
 #######################################################################
@@ -102,6 +113,10 @@ RUN chmod +x split_snvs_indels.sh
 COPY minipileup-parallel.sh .
 RUN chmod +x minipileup-parallel.sh
 
+## phase_mosaic_vars
+COPY phase_mosaic_vars.sh .
+RUN chmod +x phase_mosaic_vars.sh
+
 ## scripts/
 # filter_by_poe.py
 COPY scripts/filter_by_poe.py .
@@ -115,6 +130,18 @@ RUN chmod +x filter_clustered_variants.py
 COPY scripts/tier_filter_variants_SR_PB_ONT.py .
 RUN chmod +x tier_filter_variants_SR_PB_ONT.py
 
+# phasing_step1_get_closest_germline.sh
+COPY scripts/phasing_step1_get_closest_germline.sh .
+RUN chmod +x phasing_step1_get_closest_germline.sh
+
+# phasing_step2_phase_mosaic.py
+COPY scripts/phasing_step2_phase_mosaic.py .
+RUN chmod +x phasing_step2_phase_mosaic.py
+
+# merge_callers.py
+COPY scripts/merge_callers.py .
+RUN chmod +x merge_callers.py
+
 #######################################################################
 #     Update env
 #######################################################################
@@ -122,5 +149,6 @@ ENV PATH=/usr/local/bin/:$PATH
 ENV PATH=/usr/local/bin/samtools/:$PATH
 ENV PATH=/usr/local/bin/bcftools/:$PATH
 ENV PATH=/usr/local/bin/minipileup/:$PATH
+ENV PATH=/usr/local/bin/bedtools/bin/:$PATH
 
 CMD ["bash"]

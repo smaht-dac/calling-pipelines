@@ -32,11 +32,11 @@ inputs:
 
   - id: window_size
     type: int
-    default: 100
+    default: 50
     inputBinding:
       position: 1
       prefix: --window
-    doc: Window size in bp [100]
+    doc: Window size in bp [50]
 
 outputs:
   - id: output_file_vcf_gz
@@ -48,4 +48,4 @@ outputs:
 
 doc: |
     This tool filters clustered variants from a VCF file. |
-    Variants are considered clustered if there is another variant within a specified window size (default 100 bp)
+    Variants are considered clustered if there is another variant within a specified window size (default 50 bp)

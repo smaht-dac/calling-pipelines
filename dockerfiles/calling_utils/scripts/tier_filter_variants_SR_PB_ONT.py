@@ -27,7 +27,7 @@ except Exception:
 #*******************************************************************************
 def get_read_cutoffs(SR_cov: int, PB_cov: int,
                      error_rate: float = 0.001,
-                     target_p: float = 1e-3):
+                     target_p: float = 1e-2):
     """
     Compute read count cutoffs for SR (Short-reads), PB (PacBio),
     and combined coverage using Poisson approximation to the binomial distribution.
@@ -41,7 +41,7 @@ def get_read_cutoffs(SR_cov: int, PB_cov: int,
     error_rate : float, optional
         Sequencing error rate (default = 0.001)
     target_p : float, optional
-        Target probability for random error (default = 1e-3)
+        Target probability for random error (default = 1e-2)
 
     Returns
     -------
@@ -149,11 +149,23 @@ class MinipileupVCF:
         return the index of the ALT allele in the record.alts tuple.
         Try to match exactly first, then by first base only.
         If not found, return None.
+
+        Check length of ref to make sure alt match is accurate. Example:
+            orig vcf:
+                G>A
+            minipileup vcf:
+                GNN -> AN, ANN, A
+            Should select second alt allele
         """
+        l_ref = len(record.ref)
         for i, alt in enumerate(record.alts):
             if alt == ALT: return i
         for i, alt in enumerate(record.alts):
-            if alt[0] == ALT: return i
+            l_alt = len(alt)
+            if l_ref == l_alt:
+                alt_no_N = alt.strip('N') 
+                # takes care of cases with TNN > ACN,ANN
+                if alt_no_N == ALT: return i
         return None
 
     def add_counts(self, record: pysam.VariantRecord, sample: str, ALT_index: int):
@@ -286,9 +298,11 @@ class TieredVCF:
         self.tests = dict()  # (chrom, pos, ref, alt) -> {fisher: FisherTestResult, binomial: BinomialTestResult}
         # Only store TIER1 and TIER2 variants, others are not in dict
         self.definitions = [
-            # Tier classification
-            '##FILTER=<ID=TIER1,Description="Alt supported in both short-read and PacBio (long-read) data at or above their combined thresholds">',
-            '##FILTER=<ID=TIER2,Description="Alt supported in short-read data at or above threshold while below threshold in PacBio (long-read) data">',
+            # CrossTech classification
+            '##INFO=<ID=CrossTech,Number=0,Type=Flag,Description="Alt supported in both short-read and PacBio (long-read) data at or above their combined thresholds">',
+            '##INFO=<ID=CrossCaller,Number=0,Type=Flag,Description="Alt found in more than one variant caller">',
+            # CALLERS
+            '##INFO=<ID=CALLERS,Number=.,Type=String,Description="List of variant callers that reported this variant">',
             # Fisher strand bias
             '##INFO=<ID=SB_PVAL,Number=1,Type=Float,Description="Fisher exact test p-value for strand balance on the selected platform">',
             '##INFO=<ID=SB_SRC,Number=1,Type=String,Description="Platform used for Fisher strand test: SR (short-read) or PB (PacBio long-read)">',
@@ -421,24 +435,32 @@ class TieredVCF:
         elif chrom in ("M", "MT"): return 25
         else: return int(chrom) if chrom.isdigit() else 26
 
-    def write_tiered_vcf(self, out_vcf_path: str):
+    def write_tiered_vcf(self, out_vcf_path: str, keep_info: bool=False):
         """Write tiered VCF to out_vcf_path.
         """
         no_pileup_counts, fail_filters = 0, 0
         written, t1, t2 = 0, 0, 0
         with pysam.VariantFile(self.original_vcf.vcf_path) as vf_in:
+
             header = vf_in.header.copy()
+
             for definition in self.definitions:
                 header.add_line(definition)
-            # Add source and fileDate
-            header.add_line('##source=tier_filter_variants_SR_PB_ONT.py')
-            header.add_line(f'##fileDate={datetime.now().strftime("%Y%m%d")}')
+
             with pysam.VariantFile(out_vcf_path, "w", header=header) as vf_out:
                 for key in sorted(self.snvs, key=lambda k: (self.chrom_order(k[0]), k[1])):
                     if key not in self.minipileup_vcf.aggregate_counts:
                         no_pileup_counts += 1
                         continue  # No counts available, skip
                     record = self.snvs[key]
+
+                    # Extract CALLERS (if present) then remove all INFO fields from original vcf
+                    callers_value = record.info.get("CALLERS")
+
+                    if keep_info == False:
+                        # Clear all INFO fields
+                        record.info.clear()
+  
                     # Make record compatible with the writer header
                     record.translate(header)
                     # Reset to PASS, then add tier if present
@@ -446,7 +468,6 @@ class TieredVCF:
                     tier = self.tiers.get(key)
                     if tier not in {"TIER1", "TIER2"}:
                         continue
-                    record.filter.add(tier)
                     # Consider fisher and binomial results
                     fisher_result = self.tests[key]["fisher"]
                     binom_result = self.tests[key]["binomial"]
@@ -468,6 +489,16 @@ class TieredVCF:
                     if fisher_pass is False or binom_pass is False or binom_pass_long is False:
                       fail_filters += 1
                       continue  # Variant fails filters, do not write
+
+
+                    # Add flag for CrossTech (old Tier1 classification) and CrossCaller
+                    if tier == 'TIER1':
+                        record.info['CrossTech'] = True
+                    if len(callers_value) > 1:
+                        record.info['CrossCaller'] = True
+
+                    if keep_info == False:
+                        record.info["CALLERS"] = callers_value
                     # Add raw counts to INFO fields
                     agg = self.minipileup_vcf.aggregate_counts[key]
                     record.info["SR_ADF"] = [agg["SR"].REF_ADF, agg["SR"].ALT_ADF]
@@ -524,6 +555,8 @@ if __name__ == "__main__":
                     help="Min ALT reads for PB (PacBio) to use PB counts for the strand test (default: 2)")
     parser.add_argument("--min_alt_binom", type=int, default=1,
                     help="Min ALT reads required to run the binomial test (default: 1)")
+    parser.add_argument("--keep_info", action='store_true',
+                    help="Keep existing INFO annotations")
 
     args = parser.parse_args()
 
@@ -537,7 +570,7 @@ if __name__ == "__main__":
         min_alt_PB=args.min_alt_PB,
         min_alt_binom=args.min_alt_binom,
     )
-    tvcf.write_tiered_vcf(args.output_vcf)
+    tvcf.write_tiered_vcf(args.output_vcf, args.keep_info)
 
     if args.output_vcf.endswith(".vcf.gz"):
         pysam.tabix_index(args.output_vcf, preset="vcf", force=True)
