@@ -227,3 +227,50 @@ type:
 # Required to enable sync with a reference bucket
 uuid: 3df7d2d5-3160-4f0a-a393-f60ef4126ccb
 accession: SMAFI8H5HQ1A
+
+---
+
+################################################################
+# Strelka2 matched normal
+#  This file is used as the “matched normal” for Strelka2 for all production donors.
+#  It was created from the merged Broad GCC ST002-1D WGS illumina data
+#  (SMAFINVNFEWN and SMAFIFO11KT3) which resulted in a 220x coverage file
+################################################################
+name: strelka2-matched-normal
+description: Matched normal for Strelka2 for all production donors. |
+             The file was created from merged Broad GCC ST002-1D WGS illumina data |
+             SMAFINVNFEWN and SMAFIFO11KT3 (220x)
+format: cram
+version: SMAFINVNFEWN_SMAFIFO11KT3
+secondary_files:
+  - cram_crai
+category:
+  - Sequencing Reads
+type:
+  - Aligned Reads
+# Required to enable sync with a reference bucket
+uuid: 478a529c-c2f6-4ae3-a8aa-9a38787b124d
+accession: SMAFI7HY4QSU
+
+---
+
+################################################################
+# VEP genomic regions list, GCA_000001405.15_GRCh38_no_decoy
+#  List of regions (one region per line, e.g. chr1:1-1000000)
+#  to parallelize VEP run. Each region is 10M bases
+#  !!! Includes chrM as separate region !!!
+################################################################
+name: vep-regions-chrM-10M
+description: List of regions to parallelize VEP run. |
+             Each region is 10M bases. |
+             Includes chrM as separate region. |
+             Build hg38/GRCh38
+format: txt
+version: GCA_000001405.15_GRCh38_no_decoy
+category:
+  - Genome Region
+type:
+  - Sequence Interval
+# Required to enable sync with a reference bucket
+uuid: fe352da0-a73c-4cfc-8a11-2b371ef5ce11
+accession: SMAFIBGEOI72
