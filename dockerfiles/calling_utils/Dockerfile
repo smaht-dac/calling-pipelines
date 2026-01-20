@@ -117,6 +117,18 @@ RUN chmod +x minipileup-parallel.sh
 COPY phase_mosaic_vars.sh .
 RUN chmod +x phase_mosaic_vars.sh
 
+## phase_mosaic_vars
+COPY phase_mosaic_vars.sh .
+RUN chmod +x phase_mosaic_vars.sh
+
+## minipileup-parallel_sr_only.sh
+COPY minipileup-parallel_sr_only.sh .
+RUN chmod +x minipileup-parallel_sr_only.sh
+
+## parse_CrossTissue_minipileup_result.sh
+COPY parse_CrossTissue_minipileup_result.sh .
+RUN chmod +x parse_CrossTissue_minipileup_result.sh
+
 ## scripts/
 # filter_by_poe.py
 COPY scripts/filter_by_poe.py .
@@ -141,6 +153,14 @@ RUN chmod +x phasing_step2_phase_mosaic.py
 # merge_callers.py
 COPY scripts/merge_callers.py .
 RUN chmod +x merge_callers.py
+
+# parse_minipileup_sr_only.py
+COPY scripts/parse_minipileup_sr_only.py .
+RUN chmod +x parse_minipileup_sr_only.py
+
+# parse_minipileup_sr_only.py
+COPY scripts/set_filter_vcf.py .
+RUN chmod +x set_filter_vcf.py
 
 #######################################################################
 #     Update env

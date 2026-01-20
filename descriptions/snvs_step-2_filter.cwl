@@ -72,6 +72,17 @@ inputs:
     type: int
     doc: Number of threads to use
 
+  - id: input_files_bed
+    type:
+      -
+        items: File
+        type: array
+    doc: List of BED files with regions to exclude from the VCF
+
+  - id: current_tissue 
+    type: string
+    doc: Donor sex (3A, 3Q etc)
+
 outputs:
   output_file_vcf_gz:
     type: File
@@ -126,8 +137,51 @@ steps:
     out:
       - output_file_vcf_gz
 
+  bcftools_regions:
+    run: bcftools_regions.cwl
+    in:
+      input_file_vcf_gz:
+        source: phase_mosaic_snvs/output_file_vcf_gz
+      input_files_bed:
+        source: input_files_bed
+    out:
+      - output_file_vcf_gz
+
+  minipileup_parallel_sr_only:
+    run: minipileup-parallel_sr_only.cwl
+    in:
+      input_file_vcf_gz:
+        source: bcftools_regions/output_file_vcf_gz
+      genome_reference_fasta:
+        source: genome_reference_fasta
+      input_files_sr_cram:
+        source: input_files_sr_cram
+      input_files_tissue_descriptors:
+        source: input_files_tissue_descriptors
+      additional_args:
+        source: additional_args
+      group_intervals:
+        source: group_intervals
+    out:
+      - output_file_vcf_gz
+
+  parse_CrossTissue_minipileup_result:
+	run: parse_CrossTissue_minipileup_result.cwl
+	  in:
+	    input_file_vcf_gz:
+	      source: phase_mosaic_snvs/output_file_vcf_gz
+	    minipileup_vcf_gz:
+	      source: minipileup_parallel_sr_only/output_file_vcf_gz
+		current_tissue:
+		  source: current_tissue
+	  out:
+	    - output_file_vcf_gz
+
+
 doc: |
   Filters an SNV VCF file to retain high-confidence variants. |
   Step-2 filters: run minipileup using short-read and long-read CRAM files to compute read support for each SNV, |
   then filter and tier based on read support, strand balance (Fisher) and germline deviation (binomial), |
-  then phase/filter based on nearest germline variant
+  then phase/filter based on nearest germline variant |
+  then check all other SR within the donor for CrossTissue variants |
+  then output a final vcf with HighConf, LowConf, and . filters annotated
