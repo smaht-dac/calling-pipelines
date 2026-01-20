@@ -113,9 +113,9 @@ RUN chmod +x split_snvs_indels.sh
 COPY minipileup-parallel.sh .
 RUN chmod +x minipileup-parallel.sh
 
-## phase_mosaic_vars
-COPY phase_mosaic_vars.sh .
-RUN chmod +x phase_mosaic_vars.sh
+## remove_germline_variants.sh
+COPY remove_germline_variants.sh .
+RUN chmod +x remove_germline_variants.sh
 
 ## phase_mosaic_vars
 COPY phase_mosaic_vars.sh .
@@ -158,7 +158,7 @@ RUN chmod +x merge_callers.py
 COPY scripts/parse_minipileup_sr_only.py .
 RUN chmod +x parse_minipileup_sr_only.py
 
-# parse_minipileup_sr_only.py
+# set_filter_vcf.py
 COPY scripts/set_filter_vcf.py .
 RUN chmod +x set_filter_vcf.py
 
