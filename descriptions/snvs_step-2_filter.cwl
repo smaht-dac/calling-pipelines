@@ -81,7 +81,7 @@ inputs:
 
   - id: current_tissue 
     type: string
-    doc: Donor sex (3A, 3Q etc)
+    doc: Tissue identifier for current run (3A, 3Q etc)
 
 outputs:
   output_file_vcf_gz:
