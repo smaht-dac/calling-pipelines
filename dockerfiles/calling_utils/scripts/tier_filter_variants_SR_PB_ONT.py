@@ -73,8 +73,8 @@ def get_read_cutoffs(SR_cov: int, PB_cov: int,
                 return r
         return cov
 
-    # independent cutoffs
-    SR_cutoff = find_cutoff(SR_cov, error_rate, target_p)
+    # independent cutoffs (hard code strict cutoff!)
+    SR_cutoff = find_cutoff(SR_cov, error_rate, 1e-5)
 
     # combined cutoff using total coverage
     total_cov = SR_cov + PB_cov

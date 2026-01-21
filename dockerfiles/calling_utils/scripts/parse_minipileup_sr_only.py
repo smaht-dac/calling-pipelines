@@ -276,10 +276,18 @@ for rec in orig:
 
     # Add current tissue VAF only if >0 for that tissue
     vaf_dict = aggregated_vaf.get(key_pos, {})
-    if current_tissue_short in vaf_dict:
-        rec.info["SR_VAF"] = float(vaf_dict[current_tissue_short])
-    else:
+
+    try:
+        sr_adf = rec.info.get("SR_ADF")
+        sr_adr = rec.info.get("SR_ADR")
+        if sr_adf and sr_adr and len(sr_adf) > 1 and len(sr_adr) > 1:
+            ref = sr_adf[0] + sr_adr[0]
+            alt = sr_adf[1] + sr_adr[1]
+            if ref + alt > 0:
+                rec.info["SR_VAF"] = float(alt / (ref + alt))
+    except Exception:
         rec.info["SR_VAF"] = 0.0
+        pass
 
     # Add TISSUE_SR_VAFS if any
     if key_pos in summary:

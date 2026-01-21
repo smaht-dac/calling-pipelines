@@ -100,7 +100,7 @@ def main():
         elif crossCaller or crossTissue:
             new.filter.add("LowConf")
         else:
-            new.filter.add(".")
+            pass
 
         vcf_out.write(new)
 
