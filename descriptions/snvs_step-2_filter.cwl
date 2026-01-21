@@ -79,6 +79,13 @@ inputs:
         type: array
     doc: List of BED files with regions to exclude from the VCF
 
+  - id: input_files_tissue_descriptors
+    type:
+      -
+        items: File
+        type: array
+    doc: Tissue identifiers (e.g. SMHT009-3A)
+
   - id: current_tissue 
     type: string
     doc: Tissue identifier for current run (3A, 3Q etc)
