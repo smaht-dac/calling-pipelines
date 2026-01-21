@@ -88,7 +88,7 @@ inputs:
 
   - id: current_tissue 
     type: string
-    doc: Tissue identifier for current run (3A, 3Q etc)
+    doc: Tissue identifier for current run (SMHT009-3A, SMHT009-3Q etc)
 
 outputs:
   output_file_vcf_gz:
