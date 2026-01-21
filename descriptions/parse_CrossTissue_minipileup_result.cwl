@@ -34,7 +34,7 @@ inputs:
     type: string
     inputBinding:
       prefix: --tissue
-    doc: Current tissue being run (e.g. 3A)
+    doc: Current tissue being run (e.g. 3A or SMHT009-3A)
 
   - id: output_prefix
     type: string
