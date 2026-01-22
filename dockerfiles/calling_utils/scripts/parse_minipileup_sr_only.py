@@ -257,12 +257,12 @@ orig = pysam.VariantFile(args.orig_vcf)
 
 orig.header.info.add("SR_VAF", number=1, type="Float",
                      description="VAF for short read in current tissue")
-orig.header.info.add("PB_VAF", number=1, type="Float",
+orig.header.info.add("POOLED_PB_VAF", number=1, type="Float",
                      description="VAF for PacBio in current donor pooled tissues")
-orig.header.info.add("ONT_VAF", number=1, type="Float",
+orig.header.info.add("POOLED_ONT_VAF", number=1, type="Float",
                      description="VAF for ONT in current donor pooled tissues")
 orig.header.info.add("TISSUE_SR_VAFS", number=".", type="String",
-                     description="VAFs for all tissues with nonzero VAF")
+                     description="VAFs for all tissues with short read nonzero VAF based on pileups, reads with BQ>30")
 orig.header.info.add("CrossTissue", number=0, type="Flag",
                      description="Variant has VAF > 0 in another tissue")
 
@@ -298,7 +298,7 @@ for rec in orig:
         rec.info["CrossTissue"] = True
 
     ############################################################
-    # PB_VAF (using PB_ADF/PB_ADR, assuming Number=R [ref, alt...])
+    # POOLED_PB_VAF (using PB_ADF/PB_ADR, assuming Number=R [ref, alt...])
     # This still assumes index 1 is the mosaic ALT as before.
     # If needed, we can extend alt-index logic here similarly.
     ############################################################
@@ -309,12 +309,12 @@ for rec in orig:
             ref = lr_adf[0] + lr_adr[0]
             alt = lr_adf[1] + lr_adr[1]
             if ref + alt > 0:
-                rec.info["PB_VAF"] = float(alt / (ref + alt))
+                rec.info["POOLED_PB_VAF"] = float(alt / (ref + alt))
     except Exception:
         pass
 
     ############################################################
-    # ONT_VAF (using ONT_ADF/ONT_ADR, assuming Number=R [ref, alt...])
+    # POOLED_ONT_VAF (using ONT_ADF/ONT_ADR, assuming Number=R [ref, alt...])
     ############################################################
     try:
         ont_adf = rec.info.get("ONT_ADF")
@@ -323,7 +323,7 @@ for rec in orig:
             ref = ont_adf[0] + ont_adr[0]
             alt = ont_adf[1] + ont_adr[1]
             if ref + alt > 0:
-                rec.info["ONT_VAF"] = float(alt / (ref + alt))
+                rec.info["POOLED_ONT_VAF"] = float(alt / (ref + alt))
     except Exception:
         pass
 
