@@ -81,7 +81,7 @@ def get_read_cutoffs(SR_cov: int, PB_cov: int,
     combined_total = find_cutoff(total_cov, error_rate, target_p)
 
     # distribute proportionally to coverage, ensure ≥1 of each
-    combined_SR = max(1, round(SR_cov / total_cov * combined_total))
+    combined_SR = max(1, round(SR_cov / total_cov * float(combined_total)))
     combined_PB = max(1, combined_total - combined_SR)
 
     return dict(
