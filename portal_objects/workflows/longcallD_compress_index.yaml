@@ -3,7 +3,8 @@
 #############################################################
 name: longcallD_compress_index
 description: SNV and Indel calling using longcallD. |
-             Calls somatic variants from long-read sequencing data in CRAM format
+             Calls somatic variants from long-read sequencing data in CRAM format. |
+             Accepts a main CRAM file and a list of additional CRAM files as input (required)
 
 runner:
   language: cwl

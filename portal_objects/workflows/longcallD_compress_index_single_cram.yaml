@@ -1,9 +1,10 @@
 ## Workflow information #####################################
 #     General information for the workflow
 #############################################################
-name: longcallD_compress_index
+name: longcallD_compress_index_single_cram
 description: SNV and Indel calling using longcallD. |
-             Calls somatic variants from long-read sequencing data in CRAM format
+             Calls somatic variants from long-read sequencing data in CRAM format. |
+             Accepts a single CRAM file as input
 
 runner:
   language: cwl
