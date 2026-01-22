@@ -57,3 +57,16 @@ category:
   - Variant Calling
 # Required for displaying in the file name
 code: longcalld
+
+---
+
+################################################################
+# Sniffles, v2.7.1
+################################################################
+name: Sniffles
+version: 'v2.7.1'
+source_url: https://github.com/fritzsedlazeck/Sniffles
+category:
+  - Variant Calling
+# Required for displaying in the file name
+code: sniffles

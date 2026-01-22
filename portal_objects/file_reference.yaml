@@ -274,3 +274,24 @@ type:
 # Required to enable sync with a reference bucket
 uuid: fe352da0-a73c-4cfc-8a11-2b371ef5ce11
 accession: SMAFIBGEOI72
+
+---
+
+################################################################
+# Tandem repeat regions for Sniffles, GRCh38
+#   https://www.nature.com/articles/s41587-024-02225-z#data-availability.
+#   The current version is v2 and has not been officially released yet.
+#   Shared by Fritz Sedlazeck group: adotto.v2.final_withblend.lite.bed
+################################################################
+name: sniffles-tandem-repeat-regions
+description: Tandem repeat regions for Sniffles. |
+             Build hg38/GRCh38
+format: bed
+version: 'v2_GRCh38'
+category:
+  - Genome Region
+type:
+  - Sequence Interval
+# Required to enable sync with a reference bucket
+uuid: 593b9c8e-8dab-4eeb-911c-842fccc0945d
+accession: SMAFI5TPVA2A

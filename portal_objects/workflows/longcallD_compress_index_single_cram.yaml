@@ -1,0 +1,58 @@
+## Workflow information #####################################
+#     General information for the workflow
+#############################################################
+name: longcallD_compress_index
+description: SNV and Indel calling using longcallD. |
+             Calls somatic variants from long-read sequencing data in CRAM format
+
+runner:
+  language: cwl
+  main: longcallD_compress_index.cwl
+  child:
+    - longcallD.cwl
+    - compress_index_vcf.cwl
+
+software:
+  - longcallD@v0.0.8
+  - Samtools@1.17
+
+category:
+  - Variant Calling
+
+## Input information ########################################
+#     Input files and parameters
+#############################################################
+input:
+
+  # File inputs
+  input_file_cram:
+    argument_type: file.cram
+
+  genome_reference_fasta:
+    argument_type: file.fa
+
+  mei_reference_fasta:
+    argument_type: file.fa
+
+  # Parameter inputs
+  sample_name:
+    argument_type: parameter.string
+
+  # Optional inputs
+  platform:
+    # default: --hifi
+    argument_type: parameter.string
+
+  nthreads:
+    # default: 8
+    argument_type: parameter.integer
+
+## Output information #######################################
+#     Output files and quality controls
+#############################################################
+output:
+
+  output_file_vcf_gz:
+    argument_type: file.vcf_gz
+    secondary_files:
+      - vcf_gz_tbi
