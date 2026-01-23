@@ -243,7 +243,7 @@ for key_pos, tissue_dict in aggregated_vaf.items():
         continue
 
     # Build tissue strings
-    parts = [f"{t},{vaf:.6f}" for t, vaf in tissue_dict.items()]
+    parts = [f"{t}:{vaf:.6f}" for t, vaf in tissue_dict.items()]
     summary[key_pos] = "|".join(parts)
 
     # CrossTissue if more than one tissue has VAF

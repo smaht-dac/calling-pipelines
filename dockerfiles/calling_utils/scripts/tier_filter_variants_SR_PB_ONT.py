@@ -299,18 +299,18 @@ class TieredVCF:
         # Only store TIER1 and TIER2 variants, others are not in dict
         self.definitions = [
             # CrossTech classification
-            '##INFO=<ID=CrossTech,Number=0,Type=Flag,Description="Alt supported in both short-read and PacBio (long-read) data at or above their combined thresholds">',
+            '##INFO=<ID=CrossTech,Number=0,Type=Flag,Description="Alt supported in both short read and PacBio data at or above their combined thresholds">',
             '##INFO=<ID=CrossCaller,Number=0,Type=Flag,Description="Alt found in more than one variant caller">',
             # CALLERS
             '##INFO=<ID=CALLERS,Number=.,Type=String,Description="List of variant callers that reported this variant">',
             # Fisher strand bias
             '##INFO=<ID=SB_PVAL,Number=1,Type=Float,Description="Fisher exact test p-value for strand balance on the selected platform">',
-            '##INFO=<ID=SB_SRC,Number=1,Type=String,Description="Platform used for Fisher strand test: SR (short-read) or PB (PacBio long-read)">',
+            '##INFO=<ID=SB_SRC,Number=1,Type=String,Description="Platform used for Fisher strand test: SR (short read) or PB (PacBio long-read)">',
             # Binomial germline deviation
-            '##INFO=<ID=GLM_PVAL,Number=1,Type=Float,Description="Minimum binomial p-value for germline deviation across all platforms tested">',
-            '##INFO=<ID=GLM_PVAL_SR,Number=1,Type=Float,Description="Binomial p-value for germline deviation in short-read data">',
-            '##INFO=<ID=GLM_PVAL_PB,Number=1,Type=Float,Description="Binomial p-value for germline deviation in PacBio (long-read) data">',
-            '##INFO=<ID=GLM_PVAL_ONT,Number=1,Type=Float,Description="Binomial p-value for germline deviation in Oxford Nanopore (long-read) data">',
+            '##INFO=<ID=GERMLINE_PVAL,Number=1,Type=Float,Description="Minimum binomial p-value for germline deviation across all platforms tested">',
+            '##INFO=<ID=GERMLINE_PVAL_SR,Number=1,Type=Float,Description="Binomial p-value for germline deviation in short read data">',
+            '##INFO=<ID=GERMLINE_PVAL_PB,Number=1,Type=Float,Description="Binomial p-value for germline deviation in PacBio (long-read) data">',
+            '##INFO=<ID=GERMLINE_PVAL_ONT,Number=1,Type=Float,Description="Binomial p-value for germline deviation in Oxford Nanopore (long-read) data">',
             # Raw strand-specific counts
             '##INFO=<ID=SR_ADF,Number=2,Type=Integer,Description="Short-read forward depths (REF, ALT)">',
             '##INFO=<ID=SR_ADR,Number=2,Type=Integer,Description="Short-read reverse depths (REF, ALT)">',
@@ -514,18 +514,18 @@ class TieredVCF:
                     glm_pvals = []
                     if binom_result.p_value_SR is not None:
                         if tier == "TIER2":
-                            record.info["GLM_PVAL_SR"] = binom_result.p_value_SR
+                            record.info["GERMLINE_PVAL_SR"] = binom_result.p_value_SR
                             glm_pvals.append(binom_result.p_value_SR)
                     if binom_result.p_value_PB is not None:
                         if tier == "TIER1":
-                            record.info["GLM_PVAL_PB"] = binom_result.p_value_PB
+                            record.info["GERMLINE_PVAL_PB"] = binom_result.p_value_PB
                             glm_pvals.append(binom_result.p_value_PB)
                     if binom_result.p_value_ONT is not None:
                         if tier == "TIER1":
-                            record.info["GLM_PVAL_ONT"] = binom_result.p_value_ONT
+                            record.info["GERMLINE_PVAL_ONT"] = binom_result.p_value_ONT
                             glm_pvals.append(binom_result.p_value_ONT)
                     if glm_pvals:
-                        record.info["GLM_PVAL"] = min(glm_pvals)
+                        record.info["GERMLINE_PVAL"] = min(glm_pvals)
                     # Write record
                     vf_out.write(record)
                     written += 1
