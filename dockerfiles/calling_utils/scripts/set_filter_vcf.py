@@ -66,34 +66,36 @@ def fix_header(header):
     """
 
     final_headers= [
-            '##INFO=<ID=CrossTech,Number=0,Type=Flag,Description="Alt supported in both short read and PacBio data at or above their combined thresholds">',
+            '##INFO=<ID=CrossTech,Number=0,Type=Flag,Description="Alt supported in both tissue short read and pooled PacBio data at or above their combined read thresholds">',
             '##INFO=<ID=CrossCaller,Number=0,Type=Flag,Description="Alt found in more than one variant caller">',
-            '##INFO=<ID=CrossTissue,Number=0,Type=Flag,Description="Variant has VAF > 0 in another short read tissue">',
+            '##INFO=<ID=CrossTissue,Number=0,Type=Flag,Description="Alt has VAF > 0 in another short read tissue">',
             '##INFO=<ID=CALLERS,Number=.,Type=String,Description="List of variant callers that reported this variant">',
 
             '##INFO=<ID=SR_VAF,Number=1,Type=Float,Description="VAF for short read in current tissue">',
             '##INFO=<ID=POOLED_PB_VAF,Number=1,Type=Float,Description="VAF for PacBio in current donor pooled tissues">',
             '##INFO=<ID=POOLED_ONT_VAF,Number=1,Type=Float,Description="VAF for ONT in current donor pooled tissues">',
+            '##INFO=<ID=TISSUE_PB_VAF,Number=1,Type=Float,Description="VAF for PacBio in current tissue (if available)">',
+            '##INFO=<ID=TISSUE_ONT_VAF,Number=1,Type=Float,Description="VAF for ONT in current tissue (if available)">',
             '##INFO=<ID=TISSUE_SR_VAFS,Number=.,Type=String,Description="VAFs for all tissues with short read nonzero VAF, based on pileup (BQ≥30)">',
 
-            '##INFO=<ID=SR_ADF,Number=2,Type=Integer,Description="tissue short-read forward depths (REF,ALT)">',
-            '##INFO=<ID=SR_ADR,Number=2,Type=Integer,Description="tissue short-read reverse depths (REF,ALT)">',
-            '##INFO=<ID=PB_ADF,Number=2,Type=Integer,Description="donor pooled Long-read forward depths (REF,ALT)">',
-            '##INFO=<ID=PB_ADR,Number=2,Type=Integer,Description="donor pooled Long-read reverse depths (REF,ALT)">',
-            '##INFO=<ID=ONT_ADF,Number=2,Type=Integer,Description="donor pooled ONT forward depths (REF,ALT)">',
-            '##INFO=<ID=ONT_ADR,Number=2,Type=Integer,Description="donor pooled ONT reverse depths (REF,ALT)">',
+            '##INFO=<ID=SR_ADF,Number=2,Type=Integer,Description="Tissue short read forward depths (REF,ALT)">',
+            '##INFO=<ID=SR_ADR,Number=2,Type=Integer,Description="Tissue short read reverse depths (REF,ALT)">',
+            '##INFO=<ID=PB_ADF,Number=2,Type=Integer,Description="Donor pooled Long-read forward depths (REF,ALT)">',
+            '##INFO=<ID=PB_ADR,Number=2,Type=Integer,Description="Donor pooled Long-read reverse depths (REF,ALT)">',
+            '##INFO=<ID=ONT_ADF,Number=2,Type=Integer,Description="Donor pooled ONT forward depths (REF,ALT)">',
+            '##INFO=<ID=ONT_ADR,Number=2,Type=Integer,Description="Donor pooled ONT reverse depths (REF,ALT)">',
 
             '##INFO=<ID=SB_SRC,Number=1,Type=String,Description="Counts source used for Fisher strand test: PB, ONT, or SR">',
             '##INFO=<ID=SB_PVAL,Number=1,Type=Float,Description="Fisher p-value for strand balance on chosen sample">',
             '##INFO=<ID=GERMLINE_PVAL,Number=1,Type=Float,Description="Minimum binomial p-value for germline deviation across all platforms tested">',
-            '##INFO=<ID=GERMLINE_PVAL_SR,Number=1,Type=Float,Description="Binomial p-value for germline deviation in short-read data">',
-            '##INFO=<ID=GERMLINE_PVAL_PB,Number=1,Type=Float,Description="Binomial p-value for germline deviation in PacBio data">',
-            '##INFO=<ID=GERMLINE_PVAL_ONT,Number=1,Type=Float,Description="Binomial p-value for germline deviation in Oxford Nanopore (long-read) data">',
+            '##INFO=<ID=GERMLINE_PVAL_SR,Number=1,Type=Float,Description="Binomial p-value for germline deviation in tissue short read data">',
+            '##INFO=<ID=GERMLINE_PVAL_PB,Number=1,Type=Float,Description="Binomial p-value for germline deviation in pooled PacBio data">',
+            '##INFO=<ID=GERMLINE_PVAL_ONT,Number=1,Type=Float,Description="Binomial p-value for germline deviation in pooled ONT data">',
 
-            '##INFO=<ID=PB_PHASING,Number=1,Type=String,Description="Phasing classification from pooled PacBio haplotyping">',
+            '##INFO=<ID=PB_PHASING,Number=1,Type=String,Description="Phasing classification from pooled PacBio nearest germline SNV haplotyping">',
 
-            '##FILTER=<ID=HighConf,Description="High confidence variant">',
-            '##FILTER=<ID=LowConf,Description="Low confidence variant">',
+            '##FILTER=<ID=HighConf,Description="High confidence variant (CrossTech or CrossCaller+CrossTissue)">',
+            '##FILTER=<ID=LowConf,Description="Low confidence variant (CrossCaller or CrossTissue only)">',
             '##FILTER=<ID=.,Description="Variants passing all filters but with no CrossTech, CrossCaller, or CrossTissue evidence, lowest confidence variants">'
     ]
 

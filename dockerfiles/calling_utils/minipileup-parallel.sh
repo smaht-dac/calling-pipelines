@@ -178,7 +178,10 @@ run_region() {
     local HBAMS=()
     for cram in "${CRAMS[@]}"; do
       local bam="${WORKDIR}/$(basename "${cram%.*}")_${safe}.bam"
-      samtools view --reference "$REFERENCE_FASTA" --write-index -b -o "$bam" "$cram" "$key"
+	  # CS edit
+	  # region doesn't matter here because just generating header
+	  # faster to grab tiny region of reads for each bam
+      samtools view --reference "$REFERENCE_FASTA" --write-index -b -o "$bam" "$cram" chr1:10001-10001
       HBAMS+=("$bam")
     done
     minipileup -f "$REFERENCE_FASTA" \
