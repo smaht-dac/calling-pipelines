@@ -56,8 +56,7 @@ inputs:
     type: File
     secondaryFiles:
       - .tbi
-    doc: Germline SNV calls input VCF (bgzipped) with .tbi index
-
+    doc: Germline SNV calls input VCF (bgzipped) with .tbi index, do not need to be filtered ahead of time
 
   - id: input_files_bed
     type:
