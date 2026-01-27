@@ -14,7 +14,6 @@ from scipy.stats import fisher_exact
 try:
     from scipy.stats import binomtest as _binomtest
     def binom_pvalue(k, n, p, alternative="two-sided"):
-        import re
         return _binomtest(k, n, p, alternative=alternative).pvalue
 except Exception:
     from scipy.stats import binom_test as _binomtest
