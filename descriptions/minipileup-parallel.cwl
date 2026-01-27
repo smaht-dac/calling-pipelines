@@ -30,7 +30,7 @@ inputs:
       - .fai
     doc: Reference FASTA with index files
 
-  - id: input_files_sr_cram
+  - id: input_files_sr_cram_tissue_specific 
     type:
       -
         items: File
@@ -41,9 +41,9 @@ inputs:
       - .crai
     inputBinding:
       position: 3
-    doc: Short-read CRAM files (with .crai)
+    doc: Short-read CRAM files for donor (with .crai)
 
-  - id: input_files_pb_cram
+  - id: input_files_pb_cram_donor_pooled 
     type:
       -
         items: File
@@ -54,9 +54,20 @@ inputs:
       - .crai
     inputBinding:
       position: 4
-    doc: PacBio CRAM files (with .crai)
+    doc: PacBio CRAM files for donor (with .crai)
 
-  - id: input_files_ont_cram
+  - id: input_files_tissue_descriptors_pb
+    type:
+      -
+        items: File
+        type: array
+        inputBinding:
+          prefix: --pb-tissue
+    inputBinding:
+      position: 5
+    doc: Tissue identifiers for PacBio crams (1:1 match) (e.g. SMHT009-3A)
+
+  - id: input_files_ont_cram_donor_pooled 
     type:
       -
         items: File
@@ -66,15 +77,27 @@ inputs:
     secondaryFiles:
       - .crai
     inputBinding:
-      position: 5
-    doc: ONT CRAM files (with .crai)
+      position: 6
+    doc: ONT CRAM files for donor (with .crai)
+
+  - id: input_files_tissue_descriptors_ont
+    type:
+      -
+        items: File
+        type: array
+        inputBinding:
+          prefix: --ont-tissue
+    inputBinding:
+      position: 7
+    doc: Tissue identifiers for ONT (1:1 match) (e.g. SMHT009-3A)
+
 
   - id: output_prefix
     type: string
     default: "minipileup"
     inputBinding:
       prefix: -o
-      position: 6
+      position: 8
     doc: Output file prefix
 
   - id: additional_args
@@ -82,7 +105,7 @@ inputs:
     default: "-c -C -Q 20 -q 30 -s 0"
     inputBinding:
       prefix: --args
-      position: 7
+      position: 9
     doc: Additional minipileup args (string)
 
   - id: group_intervals
@@ -90,7 +113,7 @@ inputs:
     default: 100
     inputBinding:
       prefix: --group
-      position: 8
+      position: 10 
     doc: Group size for interval batching
 
 outputs:

@@ -27,32 +27,55 @@ inputs:
       - .fai
     doc: Reference FASTA with index files
 
-  - id: input_files_sr_cram
+  - id: input_files_sr_cram_tissue_specific
     type:
       -
         items: File
         type: array
     secondaryFiles:
       - .crai
-    doc: Short-read CRAM files (with .crai)
+    doc: Short-read CRAM files for current tissue (with .crai)
 
-  - id: input_files_pb_cram
+  - id: input_files_sr_cram_donor_pooled
     type:
       -
         items: File
         type: array
     secondaryFiles:
       - .crai
-    doc: PacBio CRAM files (with .crai)
+    doc: Short-read CRAM files for donor (with .crai)
 
-  - id: input_files_ont_cram
+  - id: input_files_pb_cram_donor_pooled
     type:
       -
         items: File
         type: array
     secondaryFiles:
       - .crai
-    doc: ONT CRAM files (with .crai)
+    doc: PacBio CRAM files for donor (with .crai)
+
+  - id: input_files_ont_cram_donor_pooled
+    type:
+      -
+        items: File
+        type: array
+    secondaryFiles:
+      - .crai
+    doc: ONT CRAM files for donor (with .crai)
+
+  - id: input_files_tissue_descriptors_pb
+    type:
+      -
+        items: File
+        type: array
+    doc: Tissue identifiers for donor pooled PacBio files (e.g. SMHT009-3A)
+
+  - id: input_files_tissue_descriptors_ont
+    type:
+      -
+        items: File
+        type: array
+    doc: Tissue identifiers for donor pooled ONT files (e.g. SMHT009-3A)
 
   - id: additional_args
     type: string
@@ -79,16 +102,16 @@ inputs:
         type: array
     doc: List of BED files with regions to exclude from the VCF
 
-  - id: input_files_tissue_descriptors
+  - id: input_files_tissue_descriptors_sr
     type:
       -
         items: File
         type: array
-    doc: Tissue identifiers (e.g. SMHT009-3A)
+    doc: Tissue identifiers for donor specific short read files (e.g. SMHT009-3A)
 
   - id: current_tissue 
     type: string
-    doc: Tissue identifier for current run (SMHT009-3A, SMHT009-3Q etc)
+    doc: Tissue identifier for current run (e.g. SMHT009-3A)
 
 outputs:
   output_file_vcf_gz:
@@ -103,12 +126,16 @@ steps:
         source: input_file_vcf_gz
       genome_reference_fasta:
         source: genome_reference_fasta
-      input_files_sr_cram:
-        source: input_files_sr_cram
-      input_files_pb_cram:
-        source: input_files_pb_cram
-      input_files_ont_cram:
-        source: input_files_ont_cram
+      input_files_sr_cram_tissue_specific:
+        source: input_files_sr_cram_tissue_specific
+      input_files_pb_cram_donor_pooled:
+        source: input_files_pb_cram_donor_pooled 
+      input_files_ont_cram_donor_pooled:
+        source: input_files_ont_cram_donor_pooled 
+      input_files_tissue_descriptors_pb:
+        source: input_files_tissue_descriptors_pb
+      input_files_tissue_descriptors_ont:
+        source: input_files_tissue_descriptors_ont
       additional_args:
         source: additional_args
       group_intervals:
@@ -123,6 +150,8 @@ steps:
         source: input_file_vcf_gz
       minipileup_vcf_gz:
         source: minipileup_parallel/output_file_vcf_gz
+	  current_tissue:
+        source: current_tissue
     out:
       - output_file_vcf_gz
 
@@ -135,8 +164,8 @@ steps:
         source: germline_input_file_vcf_gz
       genome_reference_fasta:
         source: genome_reference_fasta
-      input_files_pb_cram:
-        source: input_files_pb_cram
+      input_files_pb_cram_donor_pooled:
+        source: input_files_pb_cram_donor_pooled 
       sex:
         source: sex 
       threads:
@@ -161,10 +190,10 @@ steps:
         source: bcftools_regions/output_file_vcf_gz
       genome_reference_fasta:
         source: genome_reference_fasta
-      input_files_sr_cram:
-        source: input_files_sr_cram
-      input_files_tissue_descriptors:
-        source: input_files_tissue_descriptors
+      input_files_sr_cram_pooled_donor:
+        source: input_files_sr_cram_pooled_donor
+      input_files_tissue_descriptors_sr:
+        source: input_files_tissue_descriptors_sr
       additional_args:
         source: additional_args
       group_intervals:
@@ -173,16 +202,16 @@ steps:
       - output_file_vcf_gz
 
   parse_CrossTissue_minipileup_result:
-	run: parse_CrossTissue_minipileup_result.cwl
-	  in:
-	    input_file_vcf_gz:
-	      source: phase_mosaic_snvs/output_file_vcf_gz
-	    minipileup_vcf_gz:
-	      source: minipileup_parallel_sr_only/output_file_vcf_gz
-		current_tissue:
-		  source: current_tissue
-	  out:
-	    - output_file_vcf_gz
+    run: parse_CrossTissue_minipileup_result.cwl
+      in:
+        input_file_vcf_gz:
+          source: phase_mosaic_snvs/output_file_vcf_gz
+        minipileup_vcf_gz:
+          source: minipileup_parallel_sr_only/output_file_vcf_gz
+        current_tissue:
+          source: current_tissue
+      out:
+        - output_file_vcf_gz
 
 
 doc: |

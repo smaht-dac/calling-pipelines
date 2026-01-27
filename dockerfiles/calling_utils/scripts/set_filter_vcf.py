@@ -17,6 +17,8 @@ def clone_record(rec, out_header):
         "CrossTissue",
         "CALLERS",
         "SR_VAF",
+        "TISSUE_PB_VAF",
+        "TISSUE_ONT_VAF",
         "POOLED_PB_VAF",
         "POOLED_ONT_VAF",
         "TISSUE_SR_VAFS",
@@ -72,10 +74,10 @@ def fix_header(header):
             '##INFO=<ID=CALLERS,Number=.,Type=String,Description="List of variant callers that reported this variant">',
 
             '##INFO=<ID=SR_VAF,Number=1,Type=Float,Description="VAF for short read in current tissue">',
-            '##INFO=<ID=POOLED_PB_VAF,Number=1,Type=Float,Description="VAF for PacBio in current donor pooled tissues">',
-            '##INFO=<ID=POOLED_ONT_VAF,Number=1,Type=Float,Description="VAF for ONT in current donor pooled tissues">',
             '##INFO=<ID=TISSUE_PB_VAF,Number=1,Type=Float,Description="VAF for PacBio in current tissue (if available)">',
             '##INFO=<ID=TISSUE_ONT_VAF,Number=1,Type=Float,Description="VAF for ONT in current tissue (if available)">',
+            '##INFO=<ID=POOLED_PB_VAF,Number=1,Type=Float,Description="VAF for PacBio in current donor pooled tissues">',
+            '##INFO=<ID=POOLED_ONT_VAF,Number=1,Type=Float,Description="VAF for ONT in current donor pooled tissues">',
             '##INFO=<ID=TISSUE_SR_VAFS,Number=.,Type=String,Description="VAFs for all tissues with short read nonzero VAF, based on pileup (BQ≥30)">',
 
             '##INFO=<ID=SR_ADF,Number=2,Type=Integer,Description="Tissue short read forward depths (REF,ALT)">',

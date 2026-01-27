@@ -18,7 +18,7 @@ inputs:
       position: 1
     secondaryFiles:
       - .tbi
-    doc: Input VCF (bgzipped) with .tbi index
+    doc: Input VCF (bgzipped) with .tbi index, from bcftools_regions (only easy allowed)
 
   - id: genome_reference_fasta
     type: File
@@ -30,7 +30,7 @@ inputs:
       - .fai
     doc: Reference FASTA with index files
 
-  - id: input_files_sr_cram
+  - id: input_files_sr_cram_pooled_donor 
     type:
       -
         items: File
@@ -43,7 +43,7 @@ inputs:
       position: 3
     doc: Short-read CRAM files (with .crai)
 
-  - id: input_files_tissue_descriptors
+  - id: input_files_tissue_descriptors_sr
     type:
       -
         items: File
@@ -59,7 +59,7 @@ inputs:
     default: "minipileup"
     inputBinding:
       prefix: -o
-      position: 6
+      position: 5
     doc: Output file prefix
 
   - id: additional_args
@@ -67,7 +67,7 @@ inputs:
     default: "-c -C -Q 30 -q 30 -s 0"
     inputBinding:
       prefix: --args
-      position: 7
+      position: 6
     doc: Additional minipileup args (string)
 
   - id: group_intervals
@@ -75,7 +75,7 @@ inputs:
     default: 100
     inputBinding:
       prefix: --group
-      position: 8
+      position: 7
     doc: Group size for interval batching
 
 outputs:

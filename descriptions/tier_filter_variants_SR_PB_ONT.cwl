@@ -30,6 +30,12 @@ inputs:
       - .tbi
     doc: Minipileup VCF input (bgzipped) with corresponding tabix index (.tbi)
 
+  - id: current_tissue
+    type: string
+    inputBinding:
+      prefix: --current_tissue
+    doc: Tissue identifier for current run (e.g. SMHT009-3A)
+
   - id: output_file_name
     type: string
     default: "tiered.vcf.gz"
