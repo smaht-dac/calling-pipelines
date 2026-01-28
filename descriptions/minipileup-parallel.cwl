@@ -41,7 +41,7 @@ inputs:
       - .crai
     inputBinding:
       position: 3
-    doc: Short-read CRAM files for donor (with .crai)
+    doc: Short-read CRAM files for tissue (with .crai)
 
   - id: input_files_pb_cram_donor_pooled 
     type:
