@@ -61,10 +61,10 @@ code: longcalld
 ---
 
 ################################################################
-# Sniffles, v2.7.1
+# Sniffles, v2.7.2
 ################################################################
 name: Sniffles
-version: 'v2.7.1'
+version: 'v2.7.2'
 source_url: https://github.com/fritzsedlazeck/Sniffles
 category:
   - Variant Calling

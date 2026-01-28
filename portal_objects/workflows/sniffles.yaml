@@ -10,7 +10,7 @@ runner:
   main: sniffles.cwl
 
 software:
-  - Sniffles@v2.7.1
+  - Sniffles@v2.7.2
 
 category:
   - Variant Calling

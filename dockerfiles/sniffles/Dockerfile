@@ -34,7 +34,7 @@ RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkg
 RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
 
 # Install
-RUN conda install -c bioconda -y sniffles==2.7.1 && \
+RUN conda install -c bioconda -y sniffles==2.7.2 && \
     conda clean -a -y -f
 
 CMD ["bash"]
