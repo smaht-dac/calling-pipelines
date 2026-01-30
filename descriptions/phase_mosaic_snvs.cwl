@@ -39,7 +39,7 @@ inputs:
       - .fai
     doc: Reference FASTA with index files
 
-  - id: input_files_pb_cram
+  - id: input_files_pb_cram_donor_pooled
     type:
       -
         items: File

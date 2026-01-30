@@ -150,7 +150,7 @@ steps:
         source: input_file_vcf_gz
       minipileup_vcf_gz:
         source: minipileup_parallel/output_file_vcf_gz
-	  current_tissue:
+      current_tissue:
         source: current_tissue
     out:
       - output_file_vcf_gz
@@ -190,8 +190,8 @@ steps:
         source: bcftools_regions/output_file_vcf_gz
       genome_reference_fasta:
         source: genome_reference_fasta
-      input_files_sr_cram_pooled_donor:
-        source: input_files_sr_cram_pooled_donor
+      input_files_sr_cram_donor_pooled:
+        source: input_files_sr_cram_donor_pooled
       input_files_tissue_descriptors_sr:
         source: input_files_tissue_descriptors_sr
       additional_args:
@@ -203,15 +203,15 @@ steps:
 
   parse_CrossTissue_minipileup_result:
     run: parse_CrossTissue_minipileup_result.cwl
-      in:
-        input_file_vcf_gz:
-          source: phase_mosaic_snvs/output_file_vcf_gz
-        minipileup_vcf_gz:
-          source: minipileup_parallel_sr_only/output_file_vcf_gz
-        current_tissue:
-          source: current_tissue
-      out:
-        - output_file_vcf_gz
+    in:
+      input_file_vcf_gz:
+        source: phase_mosaic_snvs/output_file_vcf_gz
+      minipileup_vcf_gz:
+        source: minipileup_parallel_sr_only/output_file_vcf_gz
+      current_tissue:
+        source: current_tissue
+    out:
+      - output_file_vcf_gz
 
 
 doc: |

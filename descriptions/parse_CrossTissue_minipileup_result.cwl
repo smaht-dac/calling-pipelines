@@ -52,5 +52,5 @@ outputs:
       - .tbi
 
 doc: |
-	Parse results of SR only minipileup to look at CrossTissue patterns |
-	return a final vcf file with HighConf, LowConf and . filter designations
+    Parse results of SR only minipileup to look at CrossTissue patterns |
+    return a final vcf file with HighConf, LowConf and . filter designations
