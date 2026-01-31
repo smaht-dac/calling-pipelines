@@ -37,9 +37,9 @@ inputs:
 
   - id: input_files_longcallD_vcf_gz
     type:
-      -
+      - 'null'
+      - type: array
         items: File
-        type: array
         inputBinding:
           prefix: -i
           valueFrom: $( "longcallD:" + self.path )
@@ -49,9 +49,9 @@ inputs:
 
   - id: input_files_RUFUS_vcf_gz
     type:
-      -
+      - 'null'
+      - type: array
         items: File
-        type: array
         inputBinding:
           prefix: -i
           valueFrom: $( "RUFUS:" + self.path )
