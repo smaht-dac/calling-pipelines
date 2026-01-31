@@ -67,13 +67,14 @@ inputs:
       position: 5
     doc: Tissue identifiers for PacBio crams (1:1 match) (e.g. SMHT009-3A)
 
-  - id: input_files_ont_cram_donor_pooled 
+  - id: input_files_ont_cram_donor_pooled
     type:
       -
         items: File
         type: array
         inputBinding:
           prefix: --ont-cram
+    default: []
     secondaryFiles:
       - .crai
     inputBinding:
@@ -87,6 +88,7 @@ inputs:
         type: array
         inputBinding:
           prefix: --ont-tissue
+    default: []
     inputBinding:
       position: 7
     doc: Tissue identifiers for ONT (1:1 match) (e.g. SMHT009-3A)
