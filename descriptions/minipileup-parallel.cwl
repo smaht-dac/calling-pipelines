@@ -59,7 +59,7 @@ inputs:
   - id: input_files_tissue_descriptors_pb
     type:
       -
-        items: File
+        items: string
         type: array
         inputBinding:
           prefix: --pb-tissue
@@ -83,7 +83,7 @@ inputs:
   - id: input_files_tissue_descriptors_ont
     type:
       -
-        items: File
+        items: string
         type: array
         inputBinding:
           prefix: --ont-tissue
