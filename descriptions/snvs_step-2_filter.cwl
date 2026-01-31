@@ -55,6 +55,7 @@ inputs:
     doc: PacBio CRAM files for donor (with .crai)
 
   - id: input_files_ont_cram_donor_pooled
+    default: []
     type:
       -
         items: File
@@ -71,6 +72,7 @@ inputs:
     doc: Tissue identifiers for donor pooled PacBio files (e.g. SMHT009-3A)
 
   - id: input_files_tissue_descriptors_ont
+    default: []
     type:
       -
         items: File
