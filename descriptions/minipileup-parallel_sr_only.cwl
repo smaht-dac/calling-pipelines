@@ -47,7 +47,7 @@ inputs:
     type:
       -
         items: File
-        type: array
+        type: string
         inputBinding:
           prefix: --sr-tissue
     inputBinding:
