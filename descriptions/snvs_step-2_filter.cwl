@@ -67,7 +67,7 @@ inputs:
   - id: input_files_tissue_descriptors_pb
     type:
       -
-        items: File
+        items: string
         type: array
     doc: Tissue identifiers for donor pooled PacBio files (e.g. SMHT009-3A)
 
@@ -75,7 +75,7 @@ inputs:
     default: []
     type:
       -
-        items: File
+        items: string
         type: array
     doc: Tissue identifiers for donor pooled ONT files (e.g. SMHT009-3A)
 
@@ -107,7 +107,7 @@ inputs:
   - id: input_files_tissue_descriptors_sr
     type:
       -
-        items: File
+        items: string
         type: array
     doc: Tissue identifiers for donor specific short read files (e.g. SMHT009-3A)
 
