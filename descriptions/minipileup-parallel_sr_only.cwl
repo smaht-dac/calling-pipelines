@@ -46,8 +46,8 @@ inputs:
   - id: input_files_tissue_descriptors_sr
     type:
       -
-        items: File
-        type: string
+        items: string
+        type: array
         inputBinding:
           prefix: --sr-tissue
     inputBinding:
