@@ -93,10 +93,6 @@ inputs:
     type: string
     doc: Donor sex (male, female, unknown)
 
-  - id: threads
-    type: int
-    doc: Number of threads to use
-
   - id: input_files_bed
     type:
       -
@@ -169,9 +165,7 @@ steps:
       input_files_pb_cram_donor_pooled:
         source: input_files_pb_cram_donor_pooled 
       sex:
-        source: sex 
-      threads:
-        source: threads 
+        source: sex
     out:
       - output_file_vcf_gz
 
