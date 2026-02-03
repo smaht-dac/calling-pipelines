@@ -42,16 +42,16 @@ input:
 
   # Optional parameter inputs
   nthreads:
-    # default: 8
     argument_type: parameter.integer
+    value: 8
 
   kg1_version:
-    # default: v3.0
     argument_type: parameter.string
+    value: v3.0
 
   control_version:
-    # default: v1.0
     argument_type: parameter.string
+    value: v1.0
 
 ## Workflows and dependencies ###############################
 #     Information for the workflows and their dependencies
@@ -142,6 +142,7 @@ workflows:
       # Regions
       region_file_tsv:
         argument_type: file.tsv
+        mount: True
 
       shard_index:
         argument_type: parameter.integer
@@ -176,7 +177,7 @@ workflows:
     ####################################
     config:
       instance_type:
-        - c6i.32xlarge
+        - r7i.24xlarge
       ebs_size: "1.5x"
       # 10 GB should be enough for the region-based processing
       # Increase if you encounter out of disk space errors
