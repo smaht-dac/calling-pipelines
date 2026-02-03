@@ -199,8 +199,8 @@ echo "Annotating VCF with phasing information..."
 
 bcftools annotate \
   -a "$TAGS_GZ" \
-  -c CHROM,POS,PHASING \
-  -H '##INFO=<ID=PHASING,Number=1,Type=String,Description="Phasing classification from long-read haplotyping">' \
+  -c CHROM,POS,PB_PHASING \
+  -H '##INFO=<ID=PB_PHASING,Number=1,Type=String,Description="Phasing classification from long-read haplotyping">' \
   -Oz -o "$ANNOTATED_VCF" \
   "$INPUT_VCF"
 
@@ -213,7 +213,7 @@ tabix "$ANNOTATED_VCF"
 echo "Filtering variants for SR-only / interesting phasing categories..."
 
 bcftools view \
-  -i '(INFO/CrossTech=0) || (INFO/PHASING="MOSAIC_PHASED") || (INFO/PHASING="UNABLE_TO_PHASE")' \
+  -i '(INFO/CrossTech=0) || (INFO/PB_PHASING="MOSAIC_PHASED") || (INFO/PB_PHASING="UNABLE_TO_PHASE")' \
   "$ANNOTATED_VCF" \
   -Oz -o "$FINAL_VCF"
 
