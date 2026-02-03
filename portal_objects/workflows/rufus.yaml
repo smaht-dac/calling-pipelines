@@ -1,0 +1,63 @@
+## Workflow information #####################################
+#     General information for the workflow
+#############################################################
+name: rufus
+description: Run RUFUS per shard. Each shard can run multiple regions using parallel jobs. |
+             Accept a single CRAM file as input
+
+runner:
+  language: cwl
+  main: rufus.cwl
+
+software:
+  - RUFUS@dev
+
+category:
+  - Variant Calling
+
+## Input information ########################################
+#     Input files and parameters
+#############################################################
+input:
+
+  # File inputs
+  input_file_cram:
+    argument_type: file.cram
+
+  genome_reference_fasta:
+    argument_type: file.fa
+
+  genome_reference_bwt:
+    argument_type: file.bwt
+
+  region_file_tsv:
+    argument_type: file.tsv
+
+  shard_index:
+    argument_type: parameter.integer
+
+  # rufus_directory:
+  #   this is set as default in the CWL, tibanna can't handle this input type
+
+  # Parameter inputs
+  nthreads:
+    # default: 8
+    argument_type: parameter.integer
+
+  kg1_version:
+    # default: v3.0
+    argument_type: parameter.string
+
+  control_version:
+    # default: v1.0
+    argument_type: parameter.string
+
+## Output information #######################################
+#     Output files and quality controls
+#############################################################
+output:
+
+  output_file_vcf_gz:
+    argument_type: file.vcf_gz
+    secondary_files:
+      - vcf_gz_tbi

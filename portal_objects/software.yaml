@@ -70,3 +70,16 @@ category:
   - Variant Calling
 # Required for displaying in the file name
 code: sniffles
+
+---
+
+################################################################
+# RUFUS, dev
+################################################################
+name: RUFUS
+version: 'dev'
+source_url: https://github.com/stefinfection/RUFUS
+category:
+  - Variant Calling
+# Required for displaying in the file name
+code: rufus
