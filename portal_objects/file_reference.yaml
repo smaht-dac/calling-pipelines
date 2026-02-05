@@ -309,7 +309,7 @@ name: rufus-regions-byShards-1Mb
 description: List of 1Mb genomic regions divided by 5 shards for parallel |
              processing. Each shard will run ~600 regions. |
              Build hg38/GRCh38
-format: bed
+format: tsv
 version: 'GRCh38'
 category:
   - Genome Region
