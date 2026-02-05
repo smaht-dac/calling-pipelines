@@ -172,7 +172,7 @@ run_shard_region() {
 
     runRufus.sh \
       -s "$INPUT_CRAM" \
-      -cr "$REFDIR/reference.fasta" \
+      -cr "$PWD/$REFDIR/reference.fasta" \
       -m "$KMER_DEPTH_CUTOFF" \
       -k "$KMER_LENGTH" \
       -t "$THREADS" \
