@@ -34,7 +34,7 @@ input:
   region_file_tsv:
     argument_type: file.tsv
     files:
-      - complete-reference-bwt-no-alt@GCA_000001405.15_GRCh38_no_decoy # TO REPLACE, PLACEHOLDER
+      - rufus-regions-byShards-1Mb@GRCh38
 
   shard_index:
     argument_type: parameter.array
