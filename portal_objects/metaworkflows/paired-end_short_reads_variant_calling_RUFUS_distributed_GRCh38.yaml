@@ -178,7 +178,7 @@ workflows:
     config:
       instance_type:
         - c6i.32xlarge
-      ebs_size: "50"
+      ebs_size: 50
       # 50 GB should be enough for the region-based processing
       # Increase if you encounter out of disk space errors
       ebs_optimized: True
