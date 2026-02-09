@@ -16,10 +16,10 @@ def get_short_read_cutoff(short_cov: int,
 
     | Short-read depth | Typical cutoff |
     | ---------------- | -------------- |
-    | 30×              | 2–3 reads      |
-    | 100×             | 3–4 reads      |
-    | 300×             | 4–6 reads      |
-    | 1000×            | 7–9 reads      |
+    | 30x              | 2-3 reads      |
+    | 100x             | 3-4 reads      |
+    | 300x             | 4-6 reads      |
+    | 1000x            | 7-9 reads      |
 
 
     Parameters

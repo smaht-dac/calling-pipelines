@@ -3,8 +3,6 @@ import argparse
 import pysam
 
 
-import pysam
-
 def filter_clustered(input_vcf, output_vcf, window=50):
     vcf_in = pysam.VariantFile(input_vcf)
     vcf_out = pysam.VariantFile(output_vcf, "w", header=vcf_in.header)

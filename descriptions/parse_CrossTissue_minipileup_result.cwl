@@ -47,7 +47,7 @@ outputs:
   - id: output_file_vcf_gz
     type: File
     outputBinding:
-      glob: $(inputs.output_file_name + ".final.vcf.gz")
+      glob: $(inputs.output_prefix + ".final.vcf.gz")
     secondaryFiles:
       - .tbi
 

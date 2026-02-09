@@ -1,0 +1,91 @@
+## Workflow information #####################################
+#     General information for the workflow
+#############################################################
+name: snvs_step-2_filter
+description:  Filters an SNV VCF file to retain high-confidence variants. |
+              Run minipileup using short-read and long-read CRAM files to compute read support for each SNV, |
+              then filter and tier based on read support, strand balance (Fisher) and germline deviation (binomial), |
+              then phase/filter based on nearest germline variant |
+              then check all other SR within the donor for CrossTissue variants |
+              then output a final vcf with HighConf, LowConf, and . filters annotated
+
+runner:
+  language: cwl
+  main: snvs_step-2_filter.cwl
+  child:
+    - minipileup-parallel.cwl
+    - tier_filter_variants_SR_PB_ONT.cwl
+    - phase_mosaic_snvs.cwl
+    - bcftools_regions.cwl
+    - minipileup-parallel_sr_only.cwl
+    - parse_CrossTissue_minipileup_result.cwl
+
+software:
+  - minipileup@1.4b
+  - Bcftools@1.17
+  - Bedtools@v2.31.1
+
+category:
+  - Variant Calling
+
+## Input information ########################################
+#     Input files and parameters
+#############################################################
+input:
+
+  # File inputs
+  input_file_vcf_gz:
+    argument_type: file.vcf_gz
+    # This need to be linked as a single file, not array
+
+  germline_input_file_vcf_gz:
+    argument_type: file.vcf_gz
+    # This need to be linked as a single file, not array
+
+  genome_reference_fasta:
+    argument_type: file.fa
+
+  input_files_sr_cram_tissue_specific:
+    argument_type: file.cram
+ 
+  input_files_sr_cram_donor_pooled:
+    argument_type: file.cram
+
+  input_files_pb_cram_donor_pooled:
+    argument_type: file.cram
+
+  input_files_ont_cram_donor_pooled:
+    argument_type: file.cram
+
+  input_files_bed:
+    argument_type: file.bed_gz
+
+ # Arguments
+  # note: all the identifiers here will be in the format 'SMHT009-3A'
+  input_files_tissue_descriptors_sr:
+    argument_type: parameter.string
+    # This need to be linked as array
+
+  input_files_tissue_descriptors_pb:
+    argument_type: parameter.string
+    # This need to be linked as array
+
+  input_files_tissue_descriptors_ont:
+    argument_type: parameter.string
+    # This need to be linked as array
+
+  sex:
+    argument_type: parameter.string
+
+  current_tissue:
+    argument_type: parameter.string
+
+## Output information #######################################
+#     Output files and quality controls
+#############################################################
+output:
+
+  output_file_vcf_gz:
+    argument_type: file.vcf_gz
+    secondary_files:
+      - vcf_gz_tbi

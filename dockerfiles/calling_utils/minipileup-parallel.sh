@@ -225,13 +225,15 @@ run_region() {
     done
 
     # Run minipileup for this region (avoid piping so segfault can't break the shell pipeline)
-    tmp_out="${WORKDIR}/minipileup_${rsafe}.$$.$RANDOM.out"
+    local tmp_out="${WORKDIR}/minipileup_${rsafe}.$$.$RANDOM.out"
 
+    set +e
     minipileup -f "$REFERENCE_FASTA" \
       $MINPILEUP_ARGS \
       -r "$region" \
       "${BAMS[@]}" > "$tmp_out"
     mp_status=$?
+    set -e
 
     if [[ $mp_status -eq 139 ]]; then
       echo "Seg fault at $region" >&2

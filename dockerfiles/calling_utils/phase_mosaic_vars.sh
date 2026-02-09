@@ -204,7 +204,7 @@ bcftools annotate \
   -Oz -o "$ANNOTATED_VCF" \
   "$INPUT_VCF"
 
-tabix "$ANNOTATED_VCF"
+tabix -f -p vcf "$ANNOTATED_VCF"
 
 #################################################################################
 # Filter for passing variants
@@ -217,7 +217,7 @@ bcftools view \
   "$ANNOTATED_VCF" \
   -Oz -o "$FINAL_VCF"
 
-tabix "$FINAL_VCF"
+tabix -f -p vcf "$FINAL_VCF"
 
 #################################################################################
 # DONE

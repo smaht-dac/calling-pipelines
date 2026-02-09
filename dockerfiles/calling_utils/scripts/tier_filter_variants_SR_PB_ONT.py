@@ -142,7 +142,7 @@ class MinipileupVCF:
         self.current_tissue = current_tissue
 
         self.counts = dict()  # (chrom, pos, ref, alt) -> {sample: SampleCounts, ...}
-        self.aggregate_counts = dict() # (chrom, pos, ref, alt) -> {PB: SampleCounts, SR: SampleCounts, ONT: SampleCounts}\        self.tissue_pb_counts = dict()  # (chrom,pos,ref,alt) -> SampleCounts("PB_TISSUE")
+        self.aggregate_counts = dict() # (chrom, pos, ref, alt) -> {PB: SampleCounts, SR: SampleCounts, ONT: SampleCounts}
         self.tissue_pb_counts = dict()  # (chrom,pos,ref,alt) -> SampleCounts("PB_TISSUE")
         self.tissue_ont_counts = dict()  # (chrom,pos,ref,alt) -> SampleCounts("ONT_TISSUE")
 

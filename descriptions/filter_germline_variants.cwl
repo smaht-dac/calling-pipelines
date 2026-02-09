@@ -26,7 +26,6 @@ inputs:
     type: File
     inputBinding:
       prefix: -g
-      position: 2
     secondaryFiles:
       - .tbi
     doc: Germline SNV calls input VCF (bgzipped) with .tbi index

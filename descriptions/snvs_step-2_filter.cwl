@@ -55,7 +55,6 @@ inputs:
     doc: PacBio CRAM files for donor (with .crai)
 
   - id: input_files_ont_cram_donor_pooled
-    default: []
     type:
       -
         items: File
@@ -63,6 +62,13 @@ inputs:
     secondaryFiles:
       - .crai
     doc: ONT CRAM files for donor (with .crai)
+
+  - id: input_files_tissue_descriptors_sr
+    type:
+      -
+        items: string
+        type: array
+    doc: Tissue identifiers for donor pooled short read files (e.g. SMHT009-3A)
 
   - id: input_files_tissue_descriptors_pb
     type:
@@ -72,7 +78,6 @@ inputs:
     doc: Tissue identifiers for donor pooled PacBio files (e.g. SMHT009-3A)
 
   - id: input_files_tissue_descriptors_ont
-    default: []
     type:
       -
         items: string
@@ -100,13 +105,6 @@ inputs:
         type: array
     doc: List of BED files with regions to exclude from the VCF
 
-  - id: input_files_tissue_descriptors_sr
-    type:
-      -
-        items: string
-        type: array
-    doc: Tissue identifiers for donor specific short read files (e.g. SMHT009-3A)
-
   - id: current_tissue 
     type: string
     doc: Tissue identifier for current run (e.g. SMHT009-3A)
@@ -114,7 +112,7 @@ inputs:
 outputs:
   output_file_vcf_gz:
     type: File
-    outputSource: phase_mosaic_snvs/output_file_vcf_gz
+    outputSource: parse_CrossTissue_minipileup_result/output_file_vcf_gz
 
 steps:
   minipileup_parallel:
