@@ -82,6 +82,9 @@ while getopts "s:r:b:f:i:d:m:k:t:g:c:o:h" opt; do
   esac
 done
 
+REFERENCE="$(realpath "$REFERENCE")"
+REFERENCE_BWA="$(realpath "$REFERENCE_BWA")"
+
 # Auto-compute number of parallel jobs: total CPUs / threads per region
 [[ "$THREADS" -ge 1 ]] || { echo "Error: -t THREADS must be >= 1"; exit 1; }
 
@@ -151,6 +154,12 @@ run_shard_region() {
     local region_fmt
     region_fmt=$(echo "$region" | tr ':-' '_')
 
+    # Detect chrM regions
+    local is_chrM=0
+    if [[ "$region" == chrM* || "$region" == MT* ]]; then
+      is_chrM=1
+    fi
+
     # Build Jhash paths
     #   Example: chr1_1_1000000.150.1KG_v3.0.Jhash
     #            chr1_1_1000000.2.control_v1.0.Jhash
@@ -158,28 +167,41 @@ run_shard_region() {
     local control_hash="${PATH_RUFUS_DIR}/CONTROL/${CONTROL_VERSION}/${region_fmt}.2.control_${CONTROL_VERSION}.Jhash"
 
     # Existence checks
-    [[ -f "$kg1_hash" ]]      || { echo "Error: KG1 hash not found: $kg1_hash"; exit 1; }
+    if (( is_chrM == 0 )); then
+      [[ -f "$kg1_hash" ]]      || { echo "Error: KG1 hash not found: $kg1_hash"; exit 1; }
+    else
+      echo "INFO: mitochondrial region: skipping KG1 hash check and excluding KG1 -e"
+    fi
     [[ -f "$control_hash" ]]  || { echo "Error: control hash not found: $control_hash"; exit 1; }
 
     echo "==========================================="
     echo "INFO: REGION           = $region"
     echo "INFO: REGION_FMT       = $region_fmt"
-    echo "INFO: KG1 hash         = $kg1_hash"
+    if (( is_chrM == 0 )); then
+      echo "INFO: KG1 hash         = $kg1_hash"
+    else
+      echo "INFO: KG1 hash         = (skipped for mitochondrial region)"
+    fi
     echo "INFO: Control hash     = $control_hash"
     echo "INFO: KMER_DEPTH       = $KMER_DEPTH_CUTOFF"
     echo "INFO: KMER_LENGTH      = $KMER_LENGTH"
     echo "INFO: THREADS          = $THREADS"
 
-    runRufus.sh \
-      -s "$INPUT_CRAM" \
-      -cr "$PWD/$REFDIR/reference.fasta" \
-      -m "$KMER_DEPTH_CUTOFF" \
-      -k "$KMER_LENGTH" \
-      -t "$THREADS" \
-      -L -vs \
-      -e "$kg1_hash" \
-      -e "$control_hash" \
-      -R "$region" \
+    # Build runRufus args; conditionally include KG1 -e unless chrM
+    local -a rufus_args=(
+      -s "$INPUT_CRAM"
+      -cr "$PWD/$REFDIR/reference.fasta"
+      -m "$KMER_DEPTH_CUTOFF"
+      -k "$KMER_LENGTH"
+      -t "$THREADS"
+      -L -vs
+    )
+    if (( is_chrM == 0 )); then
+      rufus_args+=( -e "$kg1_hash" )
+    fi
+    rufus_args+=( -e "$control_hash" -R "$region" )
+
+    runRufus.sh "${rufus_args[@]}" \
       || { echo "Error: RUFUS failed for region $region"; exit 1; }
 
     # Move output to tmp directory
@@ -219,7 +241,7 @@ export PATH_RUFUS_DIR KG1_VERSION CONTROL_VERSION INPUT_CRAM REFDIR \
 
 # Run each region in parallel; each region gets full -t "$THREADS" inside runRufus.sh
 xargs -a "$TMP_REGIONS" -n 1 -P "$JOBS" -I {} bash -c 'run_shard_region "$@"' _ {} \
-  || { echo "Error: one or more regions failed"; exit 1; }
+  || exit 1
 
 # Collect shard outputs (sorted, safe if none)
 shopt -s nullglob

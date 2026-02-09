@@ -177,12 +177,12 @@ workflows:
     ####################################
     config:
       instance_type:
-        - r7i.24xlarge
-      ebs_size: "1.5x"
-      # 10 GB should be enough for the region-based processing
+        - c6i.32xlarge
+      ebs_size: "50"
+      # 50 GB should be enough for the region-based processing
       # Increase if you encounter out of disk space errors
       ebs_optimized: True
-      spot_instance: False
+      spot_instance: True
       run_name: run_rufus
       behavior_on_capacity_limit: wait_and_retry
 
