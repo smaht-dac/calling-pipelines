@@ -15,7 +15,7 @@ set -euo pipefail
 usage() {
   cat <<EOF
 Usage: $0 -i input.vcf.gz -r reference.fasta [-o prefix] \\
-          [--sr-cram CRAM ...] [--pb-cram CRAM ...] [--ont-cram CRAM ...] \\
+		  [--sr-cram CRAM ...] [--lr-cram CRAM ... --lr-tissue TISSUE --lr-type PB|ONT ...] \\
           [-t threads] [--args "additional minipileup args"] [--group INT]
 
   -i             Input VCF (bgzipped) with .tbi index (required)
@@ -25,10 +25,9 @@ Usage: $0 -i input.vcf.gz -r reference.fasta [-o prefix] \\
   --args         Additional arguments to pass to minipileup (in quotes) (default: "-c -C -Q 20 -q 30 -s 0")
 
   --sr-cram      Short-read CRAM with .crai file, also accept BAM with .bai or .csi index (repeatable)
-  --pb-cram      PacBio long-read CRAM with .crai file, also accept BAM with .bai or .csi index (repeatable)
-  --pb-tissue    Tissue ID matching each --pb-cram (repeatable) (eg SMHT005-3AF)
-  --ont-cram     ONT long-read CRAM with .crai file, also accept BAM with .bai or .csi index (repeatable)
-  --ont-tissue   Tissue ID matching each --ont-cram (repeatable) (eg SMHT005-3AF)
+  --lr-cram      Long-read CRAM/BAM with index (repeatable)
+  --lr-tissue    Tissue ID matching each --lr-cram (repeatable) (eg SMHT005-3AF)
+  --lr-type      Sequencing type matching each --lr-cram (repeatable) (eg PB or ONT)
 
   --group        Group intervals into batches of INT for processing (default: 100)
 EOF
@@ -50,11 +49,17 @@ GROUP=100
 # drop alleles with depth<INT (-s)
 
 SR_CRAMS=()
+
+# Long-read inputs (user-facing)
+LR_CRAMS=()
+LR_TISSUES=()
+LR_TYPES=()
+
+# Internal arrays (kept to minimize downstream diffs)
 PB_CRAMS=()
 PB_TISSUES=()
 ONT_CRAMS=()
 ONT_TISSUES=()
-
 
 # Parse args
 while [[ $# -gt 0 ]]; do
@@ -66,11 +71,9 @@ while [[ $# -gt 0 ]]; do
     --args) MINPILEUP_ARGS="$2"; shift 2;;
 
     --sr-cram) SR_CRAMS+=("$2"); shift 2;;
-    --pb-cram) PB_CRAMS+=("$2"); shift 2;;
-    --pb-tissue) PB_TISSUES+=("$2"); shift 2;;
-    --ont-cram) ONT_CRAMS+=("$2"); shift 2;;
-    --ont-tissue) ONT_TISSUES+=("$2"); shift 2;;
-
+	--lr-cram)   LR_CRAMS+=("$2"); shift 2;;
+    --lr-tissue) LR_TISSUES+=("$2"); shift 2;;
+    --lr-type)   LR_TYPES+=("$2"); shift 2;;
 
     --group) GROUP="$2"; shift 2;;
 
@@ -92,10 +95,45 @@ done
 [[ -f "$REFERENCE_FASTA" ]] || { echo "Error: $REFERENCE_FASTA not found"; exit 1; }
 [[ -f "${REFERENCE_FASTA}.fai" ]] || { echo "Error: ${REFERENCE_FASTA}.fai not found"; exit 1; }
 
+
+# Long-read presence & 1:1:1 mapping
+(( ${#LR_CRAMS[@]} > 0 )) || { echo "Error: at least one --lr-cram required"; exit 1; }
+(( ${#LR_CRAMS[@]} == ${#LR_TISSUES[@]} )) || {
+  echo "Error: number of --lr-cram entries must equal number of --lr-tissue entries"; exit 1;
+}
+(( ${#LR_CRAMS[@]} == ${#LR_TYPES[@]} )) || {
+  echo "Error: number of --lr-cram entries must equal number of --lr-type entries"; exit 1;
+}
+
+# Route LR inputs into PB_* and ONT_* arrays (downstream code stays the same)
+for i in "${!LR_CRAMS[@]}"; do
+  t="${LR_TYPES[$i]}"
+  # normalize to uppercase for robustness
+  t_up="$(printf "%s" "$t" | tr '[:lower:]' '[:upper:]')"
+  case "$t_up" in
+    PB)
+      PB_CRAMS+=("${LR_CRAMS[$i]}")
+      PB_TISSUES+=("${LR_TISSUES[$i]}")
+      ;;
+    ONT)
+      ONT_CRAMS+=("${LR_CRAMS[$i]}")
+      ONT_TISSUES+=("${LR_TISSUES[$i]}")
+      ;;
+    *)
+      echo "Error: invalid --lr-type '$t' for --lr-cram '${LR_CRAMS[$i]}'. Expected 'PB' or 'ONT'."
+      exit 1
+      ;;
+  esac
+done
+
+
+(( ${#PB_CRAMS[@]} > 0 )) || { echo "Error: at least one PB long-read (--lr-type PB) required"; exit 1; }
+
+
 # CRAM/BAM checks (index check too)
 ALL_CRAMS=("${SR_CRAMS[@]}" "${PB_CRAMS[@]}" "${ONT_CRAMS[@]}")
 if (( ${#ALL_CRAMS[@]} == 0 )); then
-  echo "Error: no BAM/CRAM files provided. Please specify at least one with --sr-cram/--pb-cram/--ont-cram"
+  echo "Error: no BAM/CRAM files provided. Please specify at least one with --sr-cram/--lr-cram"
   exit 1
 else
   for b in "${ALL_CRAMS[@]}"; do
@@ -119,16 +157,6 @@ else
   done
 fi
 
-(( ${#PB_CRAMS[@]} > 0 )) || { echo "Error: at least one --pb-cram required"; exit 1; }
-(( ${#PB_CRAMS[@]} == ${#PB_TISSUES[@]} )) || {
-  echo "Error: number of --pb-cram entries must equal number of --pb-tissue entries"; exit 1;
-}
-
-if (( ${#ONT_CRAMS[@]} > 0 )); then
-  (( ${#ONT_CRAMS[@]} == ${#ONT_TISSUES[@]} )) || {
-    echo "Error: number of --ont-cram entries must equal number of --ont-tissue entries"; exit 1;
-  }
-fi
 
 # Tool checks
 command -v bcftools >/dev/null 2>&1 || { echo "Error: bcftools not found in PATH"; exit 1; }

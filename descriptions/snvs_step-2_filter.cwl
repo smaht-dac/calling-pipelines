@@ -54,14 +54,14 @@ inputs:
       - .crai
     doc: PacBio CRAM files for donor (with .crai)
 
-  - id: input_files_ont_cram_donor_pooled
+  - id: input_files_all_long_read_cram_donor_pooled
     type:
       -
         items: File
         type: array
     secondaryFiles:
       - .crai
-    doc: ONT CRAM files for donor (with .crai)
+    doc: All long-read (PacBio + ONT) CRAM files for donor (with .crai)
 
   - id: input_files_tissue_descriptors_sr
     type:
@@ -70,19 +70,19 @@ inputs:
         type: array
     doc: Tissue identifiers for donor pooled short read files (e.g. SMHT009-3A)
 
-  - id: input_files_tissue_descriptors_pb
+  - id: input_files_tissue_descriptors_all_long_read
     type:
       -
         items: string
         type: array
-    doc: Tissue identifiers for donor pooled PacBio files (e.g. SMHT009-3A)
+    doc: Tissue identifiers for donor pooled all long read files (e.g. SMHT009-3A)
 
-  - id: input_files_tissue_descriptors_ont
+  - id: input_files_types_all_long_read
     type:
       -
         items: string
         type: array
-    doc: Tissue identifiers for donor pooled ONT files (e.g. SMHT009-3A)
+    doc: Sequencing type identifiers for PacBio + ONT (1:1 match) (e.g. PB ONT)
 
   - id: additional_args
     type: string
@@ -124,14 +124,12 @@ steps:
         source: genome_reference_fasta
       input_files_sr_cram_tissue_specific:
         source: input_files_sr_cram_tissue_specific
-      input_files_pb_cram_donor_pooled:
-        source: input_files_pb_cram_donor_pooled 
-      input_files_ont_cram_donor_pooled:
-        source: input_files_ont_cram_donor_pooled 
-      input_files_tissue_descriptors_pb:
-        source: input_files_tissue_descriptors_pb
-      input_files_tissue_descriptors_ont:
-        source: input_files_tissue_descriptors_ont
+      input_files_all_long_read_cram_donor_pooled:
+        source: input_files_all_long_read_cram_donor_pooled 
+      input_files_tissue_descriptors_all_long_read:
+        source: input_files_tissue_descriptors_all_long_read 
+      input_files_types_all_long_read:
+        source: input_files_types_all_long_read
       additional_args:
         source: additional_args
       group_intervals:

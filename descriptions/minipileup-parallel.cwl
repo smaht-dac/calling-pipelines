@@ -43,63 +43,47 @@ inputs:
       position: 3
     doc: Short-read CRAM files for tissue (with .crai)
 
-  - id: input_files_pb_cram_donor_pooled 
+  - id: input_files_all_long_read_cram_donor_pooled
     type:
       -
         items: File
         type: array
         inputBinding:
-          prefix: --pb-cram
-    secondaryFiles:
-      - .crai
-    inputBinding:
-      position: 4
-    doc: PacBio CRAM files for donor (with .crai)
-
-  - id: input_files_tissue_descriptors_pb
-    type:
-      -
-        items: string
-        type: array
-        inputBinding:
-          prefix: --pb-tissue
-    inputBinding:
-      position: 5
-    doc: Tissue identifiers for PacBio crams (1:1 match) (e.g. SMHT009-3A)
-
-  - id: input_files_ont_cram_donor_pooled
-    type:
-      -
-        items: File
-        type: array
-        inputBinding:
-          prefix: --ont-cram
-    default: []
+          prefix: --lr-cram
     secondaryFiles:
       - .crai
     inputBinding:
       position: 6
-    doc: ONT CRAM files for donor (with .crai)
+    doc: PacBio + ONT CRAM files for donor (with .crai)
 
-  - id: input_files_tissue_descriptors_ont
+  - id: input_files_tissue_descriptors_all_long_read
     type:
       -
         items: string
         type: array
         inputBinding:
-          prefix: --ont-tissue
-    default: []
+          prefix: --lr-tissue
     inputBinding:
       position: 7
-    doc: Tissue identifiers for ONT (1:1 match) (e.g. SMHT009-3A)
+    doc: Tissue identifiers for PacBio + ONT (1:1 match) (e.g. SMHT009-3A)
 
+  - id: input_files_types_all_long_read
+    type:
+      -
+        items: string
+        type: array
+        inputBinding:
+          prefix: --lr-type
+    inputBinding:
+      position: 8
+    doc: Sequencing type identifiers for PacBio + ONT (1:1 match) (e.g. PB ONT...)
 
   - id: output_prefix
     type: string
     default: "minipileup"
     inputBinding:
       prefix: -o
-      position: 8
+      position: 9
     doc: Output file prefix
 
   - id: additional_args
@@ -107,7 +91,7 @@ inputs:
     default: "-c -C -Q 20 -q 30 -s 0"
     inputBinding:
       prefix: --args
-      position: 9
+      position: 10 
     doc: Additional minipileup args (string)
 
   - id: group_intervals
@@ -115,7 +99,7 @@ inputs:
     default: 100
     inputBinding:
       prefix: --group
-      position: 10 
+      position: 11 
     doc: Group size for interval batching
 
 outputs:

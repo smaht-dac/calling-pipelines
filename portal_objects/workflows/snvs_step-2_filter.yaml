@@ -54,7 +54,7 @@ input:
   input_files_pb_cram_donor_pooled:
     argument_type: file.cram
 
-  input_files_ont_cram_donor_pooled:
+  input_files_all_long_read_cram_donor_pooled:
     argument_type: file.cram
 
   input_files_bed:
@@ -66,11 +66,11 @@ input:
     argument_type: parameter.string
     # This need to be linked as array
 
-  input_files_tissue_descriptors_pb:
+  input_files_tissue_descriptors_all_long_read:
     argument_type: parameter.string
     # This need to be linked as array
 
-  input_files_tissue_descriptors_ont:
+  input_files_types_all_long_read:
     argument_type: parameter.string
     # This need to be linked as array
 
