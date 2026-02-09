@@ -53,7 +53,7 @@ inputs:
     secondaryFiles:
       - .crai
     inputBinding:
-      position: 6
+      position: 4
     doc: PacBio + ONT CRAM files for donor (with .crai)
 
   - id: input_files_tissue_descriptors_all_long_read
@@ -64,7 +64,7 @@ inputs:
         inputBinding:
           prefix: --lr-tissue
     inputBinding:
-      position: 7
+      position: 5
     doc: Tissue identifiers for PacBio + ONT (1:1 match) (e.g. SMHT009-3A)
 
   - id: input_files_types_all_long_read
@@ -75,7 +75,7 @@ inputs:
         inputBinding:
           prefix: --lr-type
     inputBinding:
-      position: 8
+      position: 6
     doc: Sequencing type identifiers for PacBio + ONT (1:1 match) (e.g. PB ONT...)
 
   - id: output_prefix
@@ -83,7 +83,7 @@ inputs:
     default: "minipileup"
     inputBinding:
       prefix: -o
-      position: 9
+      position: 7
     doc: Output file prefix
 
   - id: additional_args
@@ -91,7 +91,7 @@ inputs:
     default: "-c -C -Q 20 -q 30 -s 0"
     inputBinding:
       prefix: --args
-      position: 10 
+      position: 8 
     doc: Additional minipileup args (string)
 
   - id: group_intervals
@@ -99,7 +99,7 @@ inputs:
     default: 100
     inputBinding:
       prefix: --group
-      position: 11 
+      position: 9 
     doc: Group size for interval batching
 
 outputs:
