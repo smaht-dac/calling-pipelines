@@ -67,7 +67,7 @@ fi
 
 # Process VCF
 echo "Processing VCF..."
-bcftools view --threads "$NTHREADS" -i "$FILTER" -Ou "$INPUT_VCF" \
+bcftools view -v snps,indels --threads "$NTHREADS" -i "$FILTER" -Ou "$INPUT_VCF" \
     | bcftools norm --threads "$NTHREADS" --check-ref x -m -any --atomize -f "$REFERENCE_FASTA" -Ou - \
     | bcftools norm --threads "$NTHREADS" -d exact -Ou - \
     | bcftools sort --threads "$NTHREADS" -T "tmp_bcftools.XXXXXX" -Oz -o "${OUTPUT_PRFX}.vcf.gz" \
