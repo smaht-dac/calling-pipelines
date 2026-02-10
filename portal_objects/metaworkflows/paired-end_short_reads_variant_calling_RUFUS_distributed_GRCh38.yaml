@@ -177,18 +177,19 @@ workflows:
     ####################################
     config:
       instance_type:
+        - c6i.24xlarge
         - c6i.32xlarge
+        - c6a.24xlarge
         - c6a.32xlarge
-        - c7i.32xlarge
+        - c6a.48xlarge
+        - c7i.24xlarge
+        - c7i.48xlarge
+        - c7a.24xlarge
         - c7a.32xlarge
+        - c7a.48xlarge
+        - c8i.24xlarge
         - c8i.32xlarge
-        - c8a.32xlarge
-        # - m6i.32xlarge
-        # - m6a.32xlarge
-        # - m7i.32xlarge
-        # - m7a.32xlarge
-        # - m8i.32xlarge
-        # - m8a.32xlarge
+        - c8a.24xlarge
       ebs_size: 50
       # 50 GB should be enough for the region-based processing
       # Increase if you encounter out of disk space errors
