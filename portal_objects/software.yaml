@@ -74,10 +74,10 @@ code: sniffles
 ---
 
 ################################################################
-# RUFUS, dev
+# RUFUS, d1.1.2
 ################################################################
 name: RUFUS
-version: 'dev'
+version: 'd1.1.2'
 source_url: https://github.com/stefinfection/RUFUS
 category:
   - Variant Calling
