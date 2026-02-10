@@ -71,7 +71,7 @@ while [[ $# -gt 0 ]]; do
     --args) MINPILEUP_ARGS="$2"; shift 2;;
 
     --sr-cram) SR_CRAMS+=("$2"); shift 2;;
-	--lr-cram)   LR_CRAMS+=("$2"); shift 2;;
+    --lr-cram)   LR_CRAMS+=("$2"); shift 2;;
     --lr-tissue) LR_TISSUES+=("$2"); shift 2;;
     --lr-type)   LR_TYPES+=("$2"); shift 2;;
 
@@ -188,6 +188,10 @@ HEADER_VCF="${WORKDIR}/header.vcf"
 # Extract intervals from VCF
 echo "Extracting intervals to file..."
 bcftools query -f '%CHROM:%POS-%END\n' "$INPUT_VCF" > "$INTERVALS"
+if [[ ! -s "$INTERVALS" ]]; then
+  echo "Error: input VCF contains no valid variants" >&2
+  exit 1
+fi
 
 # Group intervals into batches (to reduce overhead)
 GROUPED="${WORKDIR}/intervals_grouped.txt"
@@ -224,7 +228,7 @@ run_region() {
     local HBAMS=()
     for cram in "${CRAMS[@]}"; do
       local bam="${WORKDIR}/$(basename "${cram%.*}")_${safe}.bam"
-      samtools view --reference "$REFERENCE_FASTA" --write-index -b -o "$bam" "$cram" chr1:10001-10001
+      samtools view --reference "$REFERENCE_FASTA" --write-index -b -o "$bam" "$cram" "$key"
       HBAMS+=("$bam")
     done
     minipileup -f "$REFERENCE_FASTA" \
@@ -297,10 +301,12 @@ export SORTED_VCF="${WORKDIR}/sorted.vcf"
 
 # Safety check
 if [[ ! -s "$GROUPED" ]]; then
-    echo "Error: grouped intervals file is empty"
-    run_region chr1:10001-10001 1 "${ALL_CRAMS[@]}"
+    echo "Error: interval grouping produced empty output (unexpected). Check awk/group settings." >&2
+    exit 1
+    # echo "Error: grouped intervals file is empty"
+    # run_region chr1:10001-10001 1 "${ALL_CRAMS[@]}"
 
-    cat "$HEADER_VCF" > "$MERGED_VCF"
+    # cat "$HEADER_VCF" > "$MERGED_VCF"
 else
     # Create temporary VCF file with header only
     echo "Creating temporary VCF with header..."
