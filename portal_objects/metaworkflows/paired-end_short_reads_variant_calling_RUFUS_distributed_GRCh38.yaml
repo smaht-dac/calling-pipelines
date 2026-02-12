@@ -43,7 +43,7 @@ input:
   # Optional parameter inputs
   nthreads:
     argument_type: parameter.integer
-    value: 8
+    value: 3
 
   kg1_version:
     argument_type: parameter.string
