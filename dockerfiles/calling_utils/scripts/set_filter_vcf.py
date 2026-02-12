@@ -98,7 +98,7 @@ def fix_header(header):
 
             '##FILTER=<ID=HighConf,Description="High confidence variant (CrossTech or CrossCaller+CrossTissue)">',
             '##FILTER=<ID=LowConf,Description="Low confidence variant (CrossCaller or CrossTissue only)">',
-            '##FILTER=<ID=.,Description="Variants passing all filters but with no CrossTech, CrossCaller, or CrossTissue evidence, lowest confidence variants">'
+            '##FILTER=<ID=LikelyArtifact,Description="Variants passing all filters but with no CrossTech, CrossCaller, or CrossTissue evidence, lowest confidence variants">'
     ]
 
     header_list = str(header).split('\n')
@@ -186,7 +186,7 @@ def main():
         elif crossCaller or crossTissue:
             new.filter.add("LowConf")
         else:
-            pass
+            new.filter.add("LikelyArtifact")
 
         vcf_out.write(new)
 
