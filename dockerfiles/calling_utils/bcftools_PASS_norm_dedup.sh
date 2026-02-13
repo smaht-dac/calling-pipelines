@@ -70,7 +70,7 @@ echo "Processing VCF..."
 bcftools view -v snps,indels --threads "$NTHREADS" -i "$FILTER" -Ou "$INPUT_VCF" \
     | bcftools norm --threads "$NTHREADS" --check-ref x -m -any --atomize -f "$REFERENCE_FASTA" -Ou - \
     | bcftools norm --threads "$NTHREADS" -d exact -Ou - \
-    | bcftools sort --threads "$NTHREADS" -T "tmp_bcftools.XXXXXX" -Oz -o "${OUTPUT_PRFX}.vcf.gz" \
+    | bcftools sort -T "tmp_bcftools.XXXXXX" -Oz -o "${OUTPUT_PRFX}.vcf.gz" \
     || { echo "Error: bcftools normalization failed"; exit 1; }
 
 bcftools index --threads "$NTHREADS" --tbi "${OUTPUT_PRFX}.vcf.gz" || { echo "Error: bcftools index failed"; exit 1; }
