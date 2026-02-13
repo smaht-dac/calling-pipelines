@@ -20,21 +20,21 @@ category:
 input:
 
   # File arguments
-  input_file_TNhaplotyper2_vcf_gz:
+  input_files_TNhaplotyper2_vcf_gz:
     argument_type: file.vcf_gz
-    dimensionality: 0
+    dimensionality: 1
 
-  input_file_Strelka2_vcf_gz:
+  input_files_Strelka2_vcf_gz:
     argument_type: file.vcf_gz
-    dimensionality: 0
+    dimensionality: 1
 
-  input_file_longcallD_vcf_gz:
+  input_files_longcallD_vcf_gz:
     argument_type: file.vcf_gz
-    dimensionality: 0
+    dimensionality: 1
 
-  input_file_RUFUS_vcf_gz:
+  input_files_RUFUS_vcf_gz:
     argument_type: file.vcf_gz
-    dimensionality: 0
+    dimensionality: 1
 
   germline_input_file_vcf_gz:
     argument_type: file.vcf_gz
@@ -135,7 +135,8 @@ workflows:
       # File argument
       input_file_vcf_gz:
         argument_type: file.vcf_gz
-        source_argument_name: input_file_TNhaplotyper2_vcf_gz
+        source_argument_name: input_files_TNhaplotyper2_vcf_gz
+        scatter: 1
 
       genome_reference_fasta:
         argument_type: file.fa
@@ -183,7 +184,8 @@ workflows:
       # File argument
       input_file_vcf_gz:
         argument_type: file.vcf_gz
-        source_argument_name: input_file_Strelka2_vcf_gz
+        source_argument_name: input_files_Strelka2_vcf_gz
+        scatter: 1
 
       genome_reference_fasta:
         argument_type: file.fa
@@ -231,7 +233,8 @@ workflows:
       # File argument
       input_file_vcf_gz:
         argument_type: file.vcf_gz
-        source_argument_name: input_file_longcallD_vcf_gz
+        source_argument_name: input_files_longcallD_vcf_gz
+        scatter: 1
 
       genome_reference_fasta:
         argument_type: file.fa
@@ -281,7 +284,8 @@ workflows:
       # File argument
       input_file_vcf_gz:
         argument_type: file.vcf_gz
-        source_argument_name: input_file_RUFUS_vcf_gz
+        source_argument_name: input_files_RUFUS_vcf_gz
+        scatter: 1
 
       genome_reference_fasta:
         argument_type: file.fa
@@ -372,6 +376,7 @@ workflows:
 
       gnomad_vcf_gz:
         argument_type: file.vcf_gz
+        mount: True
 
       # Parameters
       sample_name:
@@ -392,6 +397,9 @@ workflows:
           - Somatic Variant Calls
         data_type:
           - SNV
+        output_status: Final Output
+        # These fields are required to link metadata for the naming
+        reference_genome: GRCh38
 
       output_indels_vcf_gz:
         description: filtered indel calls from Step-1 filters
@@ -399,18 +407,21 @@ workflows:
           - Somatic Variant Calls
         data_type:
           - Indel
+        output_status: Final Output
+        # These fields are required to link metadata for the naming
+        reference_genome: GRCh38
 
     ## EC2 Configuration to use ########
     ####################################
     config:
       instance_type:
-        - c6i.8xlarge
-        - c6a.8xlarge
-        - m6i.8xlarge
-        - m6a.8xlarge
-        - m7i.8xlarge
-        - m7a.8xlarge
-      ebs_size: 50
+        - c6i.4xlarge
+        - c6a.4xlarge
+        - m6i.4xlarge
+        - m6a.4xlarge
+        - m7i.4xlarge
+        - m7a.4xlarge
+      ebs_size: 100
       ebs_optimized: True
       spot_instance: True
       run_name: run_snvs_step-1_filter
@@ -439,15 +450,19 @@ workflows:
 
       input_files_sr_cram_tissue_specific:
         argument_type: file.cram
+        mount: True
     
       input_files_sr_cram_donor_pooled:
         argument_type: file.cram
+        mount: True
 
       input_files_pb_cram_donor_pooled:
         argument_type: file.cram
+        mount: True
 
       input_files_all_long_read_cram_donor_pooled:
         argument_type: file.cram
+        mount: True
 
       input_files_bed:
           argument_type: file.bed_gz
@@ -489,13 +504,13 @@ workflows:
     ####################################
     config:
       instance_type:
-        - c6i.8xlarge
-        - c6a.8xlarge
-        - m6i.8xlarge
-        - m6a.8xlarge
-        - m7i.8xlarge
-        - m7a.8xlarge
-      ebs_size: 50
+        - c6i.4xlarge
+        - c6a.4xlarge
+        - m6i.4xlarge
+        - m6a.4xlarge
+        - m7i.4xlarge
+        - m7a.4xlarge
+      ebs_size: 15
       ebs_optimized: True
       spot_instance: True
       run_name: run_snvs_step-2_filter

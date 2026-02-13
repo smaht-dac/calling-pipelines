@@ -53,16 +53,16 @@ WORKDIR /usr/local/bin/
 RUN ln -s samtools-1.17 samtools
 
 ## Bcftools install
-RUN wget https://github.com/samtools/bcftools/releases/download/1.17/bcftools-1.17.tar.bz2 && \
-    tar -xjf bcftools-1.17.tar.bz2 && \
-    rm -rf bcftools-1.17.tar.bz2
+RUN wget https://github.com/samtools/bcftools/releases/download/1.23/bcftools-1.23.tar.bz2 && \
+    tar -xjf bcftools-1.23.tar.bz2 && \
+    rm -rf bcftools-1.23.tar.bz2
 
-WORKDIR /usr/local/bin/bcftools-1.17
+WORKDIR /usr/local/bin/bcftools-1.23
 RUN ./configure && \
     make
 
 WORKDIR /usr/local/bin/
-RUN ln -s bcftools-1.17 bcftools
+RUN ln -s bcftools-1.23 bcftools
 
 ## minipileup
 RUN wget https://github.com/lh3/minipileup/archive/refs/tags/v1.4b.tar.gz && \
