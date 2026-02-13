@@ -104,6 +104,9 @@ def fix_header(header):
     header_list = str(header).split('\n')
 
     new_header = pysam.VariantHeader()
+    #-- This should remove the PASS filter
+    new_header.filters.get('PASS').remove_header()
+    #---------------------------------------------
     for header_line in header_list:
         if "fileformat" in header_line or "contig" in header_line:
             new_header.add_line(header_line)
