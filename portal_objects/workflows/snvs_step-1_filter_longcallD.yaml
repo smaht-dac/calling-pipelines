@@ -1,7 +1,7 @@
 ## Workflow information #####################################
 #     General information for the workflow
 #############################################################
-name: snvs_step-1_filter
+name: snvs_step-1_filter_longcallD
 description:   Filters a VCF file to retain high-confidence variants. |
                Merge variants from callers (pre-filtered PASS calls, normalized and atomized); |
                remove germline and clustered variants; remove difficult genomic regions; |
@@ -44,6 +44,9 @@ input:
     argument_type: file.vcf_gz
 
   input_files_Strelka2_vcf_gz:
+    argument_type: file.vcf_gz
+
+  input_files_longcallD_vcf_gz:
     argument_type: file.vcf_gz
 
   input_files_RUFUS_vcf_gz:
