@@ -11,13 +11,13 @@ hints:
   - class: DockerRequirement
     dockerPull: ACCOUNT/calling_utils:VERSION
 
-baseCommand: [tier_filter_variants_SR_PB_ONT.py]
+baseCommand: [parse_CrossTissue_minipileup_result.sh]
 
 inputs:
   - id: input_file_vcf_gz
     type: File
     inputBinding:
-      prefix: --input_vcf
+      prefix: -i
     secondaryFiles:
       - .tbi
     doc: Input VCF (bgzipped) with corresponding tabix index (.tbi)
@@ -25,7 +25,7 @@ inputs:
   - id: minipileup_vcf_gz
     type: File
     inputBinding:
-      prefix: --minipileup_vcf
+      prefix: --mp
     secondaryFiles:
       - .tbi
     doc: Minipileup VCF input (bgzipped) with corresponding tabix index (.tbi)
@@ -33,24 +33,24 @@ inputs:
   - id: current_tissue
     type: string
     inputBinding:
-      prefix: --current_tissue
-    doc: Tissue identifier for current run (e.g. SMHT009-3A)
+      prefix: --tissue
+    doc: Current tissue being run (e.g. 3A or SMHT009-3A)
 
-  - id: output_file_name
+  - id: output_prefix
     type: string
-    default: "tiered.vcf.gz"
+    default: "output"
     inputBinding:
-      prefix: --output_vcf
-    doc: Output VCF filename; use .vcf.gz to enable bgzip + tabix indexing
+      prefix: -o
+    doc: Output prefix
 
 outputs:
   - id: output_file_vcf_gz
     type: File
     outputBinding:
-      glob: $(inputs.output_file_name)
+      glob: $(inputs.output_prefix + ".final.vcf.gz")
     secondaryFiles:
       - .tbi
 
 doc: |
-    Tier and filter variants using short-read (SR), PacBio, and ONT minipileup counts. |
-    Applies read-support thresholds, Fisher strand-bias, and binomial germline-deviation tests
+    Parse results of SR only minipileup to look at CrossTissue patterns |
+    return a final vcf file with HighConf, LowConf and . filter designations

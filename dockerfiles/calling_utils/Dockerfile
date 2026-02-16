@@ -53,16 +53,16 @@ WORKDIR /usr/local/bin/
 RUN ln -s samtools-1.17 samtools
 
 ## Bcftools install
-RUN wget https://github.com/samtools/bcftools/releases/download/1.17/bcftools-1.17.tar.bz2 && \
-    tar -xjf bcftools-1.17.tar.bz2 && \
-    rm -rf bcftools-1.17.tar.bz2
+RUN wget https://github.com/samtools/bcftools/releases/download/1.23/bcftools-1.23.tar.bz2 && \
+    tar -xjf bcftools-1.23.tar.bz2 && \
+    rm -rf bcftools-1.23.tar.bz2
 
-WORKDIR /usr/local/bin/bcftools-1.17
+WORKDIR /usr/local/bin/bcftools-1.23
 RUN ./configure && \
     make
 
 WORKDIR /usr/local/bin/
-RUN ln -s bcftools-1.17 bcftools
+RUN ln -s bcftools-1.23 bcftools
 
 ## minipileup
 RUN wget https://github.com/lh3/minipileup/archive/refs/tags/v1.4b.tar.gz && \
@@ -113,9 +113,21 @@ RUN chmod +x split_snvs_indels.sh
 COPY minipileup-parallel.sh .
 RUN chmod +x minipileup-parallel.sh
 
+## remove_germline_variants.sh
+COPY remove_germline_variants.sh .
+RUN chmod +x remove_germline_variants.sh
+
 ## phase_mosaic_vars
 COPY phase_mosaic_vars.sh .
 RUN chmod +x phase_mosaic_vars.sh
+
+## minipileup-parallel_sr_only.sh
+COPY minipileup-parallel_sr_only.sh .
+RUN chmod +x minipileup-parallel_sr_only.sh
+
+## parse_CrossTissue_minipileup_result.sh
+COPY parse_CrossTissue_minipileup_result.sh .
+RUN chmod +x parse_CrossTissue_minipileup_result.sh
 
 ## scripts/
 # filter_by_poe.py
@@ -141,6 +153,14 @@ RUN chmod +x phasing_step2_phase_mosaic.py
 # merge_callers.py
 COPY scripts/merge_callers.py .
 RUN chmod +x merge_callers.py
+
+# parse_minipileup_sr_only.py
+COPY scripts/parse_minipileup_sr_only.py .
+RUN chmod +x parse_minipileup_sr_only.py
+
+# set_filter_vcf.py
+COPY scripts/set_filter_vcf.py .
+RUN chmod +x set_filter_vcf.py
 
 #######################################################################
 #     Update env

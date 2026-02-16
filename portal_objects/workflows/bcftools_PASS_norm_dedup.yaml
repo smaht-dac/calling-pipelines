@@ -1,0 +1,38 @@
+## Workflow information #####################################
+#     General information for the workflow
+#############################################################
+name: bcftools_PASS_norm_dedup
+description:  Run Bcftools to filter PASS variants, |
+              normalize and deduplicate variants in input VCF file
+
+runner:
+  language: cwl
+  main: bcftools_PASS_norm_dedup.cwl
+
+software:
+  - Bcftools@1.17
+
+category:
+  - Variant Manipulation
+
+## Input information ########################################
+#     Input files and parameters
+#############################################################
+input:
+
+  # File inputs
+  input_file_vcf_gz:
+    argument_type: file.vcf_gz
+
+  genome_reference_fasta:
+    argument_type: file.fa
+
+## Output information #######################################
+#     Output files and quality controls
+#############################################################
+output:
+
+  output_file_vcf_gz:
+    argument_type: file.vcf_gz
+    secondary_files:
+      - vcf_gz_tbi

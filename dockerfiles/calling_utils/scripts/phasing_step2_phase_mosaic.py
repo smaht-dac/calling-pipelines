@@ -132,7 +132,7 @@ def write_phasing_tags(results, out_prefix):
     """Generate phasing_tags.tsv for bcftools annotate."""
     out_path = f"{out_prefix}_phasing_tags.tsv"
     with open(out_path, "w") as f:
-        f.write("#CHROM\tPOS\tPHASING\n")
+        f.write("#CHROM\tPOS\tPB_PHASING\n")
         for r in results:
             chrom = r["chrom"]
             pos = r["Var_pos"]

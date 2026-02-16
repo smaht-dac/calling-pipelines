@@ -1,0 +1,96 @@
+## Workflow information #####################################
+#     General information for the workflow
+#############################################################
+name: snvs_step-1_filter
+description:   Filters a VCF file to retain high-confidence variants. |
+               Merge variants from callers (pre-filtered PASS calls, normalized and atomized); |
+               remove germline and clustered variants; remove difficult genomic regions; |
+               Brain Somatic Mosaicism Network (BSMN) filter; run VEP and filter by allele frequency. |
+               Splits the filtered variants into separate SNV and indel VCF files
+
+runner:
+  language: cwl
+  main: snvs_step-1_filter.cwl
+  child:
+    - merge_callers.cwl
+    - filter_germline_variants.cwl
+    - filter_clustered_variants.cwl
+    - bcftools_regions.cwl
+    - filter_panel_errors.cwl
+    - vep-parallel.cwl
+    - granite_filterByTag.cwl
+    - compress_index_vcf.cwl
+    - split_snvs_indels.cwl
+
+software:
+  - VEP@114
+  - granite-suite@0.5.0
+  - Bcftools@1.23
+  - Bedtools@v2.31.1
+
+category:
+  - Variant Manipulation
+
+## Input information ########################################
+#     Input files and parameters
+#############################################################
+input:
+
+  # File inputs
+  genome_reference_fasta:
+    argument_type: file.fa
+
+  input_files_TNhaplotyper2_vcf_gz:
+    argument_type: file.vcf_gz
+
+  input_files_Strelka2_vcf_gz:
+    argument_type: file.vcf_gz
+
+  input_files_longcallD_vcf_gz:
+    argument_type: file.vcf_gz
+
+  input_files_RUFUS_vcf_gz:
+    argument_type: file.vcf_gz
+
+  germline_input_file_vcf_gz:
+    argument_type: file.vcf_gz
+    # This need to be linked as a single file, not array
+
+  input_files_bed:
+    argument_type: file.bed_gz
+
+  panel_of_normals_fasta:
+    argument_type: file.fa
+
+  regions_list_txt:
+    argument_type: file.txt
+
+  vep_database_archive:
+    argument_type: file.tar_gz
+
+  gnomad_vcf_gz:
+    argument_type: file.vcf_gz
+
+  # Arguments
+  tag_filters:
+    argument_type: parameter.string
+    # This need to be linked as array
+
+  sample_name:
+    argument_type: parameter.string
+    # This is the ACCID
+
+## Output information #######################################
+#     Output files and quality controls
+#############################################################
+output:
+
+  output_snvs_vcf_gz:
+    argument_type: file.vcf_gz
+    secondary_files:
+      - vcf_gz_tbi
+
+  output_indels_vcf_gz:
+    argument_type: file.vcf_gz
+    secondary_files:
+      - vcf_gz_tbi

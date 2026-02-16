@@ -8,7 +8,7 @@ requirements:
   - class: DockerRequirement
     dockerPull: ACCOUNT/calling_utils:VERSION
 
-baseCommand: [minipileup-parallel.sh]
+baseCommand: [minipileup-parallel_sr_only.sh]
 
 inputs:
   - id: input_file_vcf_gz
@@ -18,7 +18,7 @@ inputs:
       position: 1
     secondaryFiles:
       - .tbi
-    doc: Input VCF (bgzipped) with .tbi index
+    doc: Input VCF (bgzipped) with .tbi index, from bcftools_regions (only easy allowed)
 
   - id: genome_reference_fasta
     type: File
@@ -30,7 +30,7 @@ inputs:
       - .fai
     doc: Reference FASTA with index files
 
-  - id: input_files_sr_cram_tissue_specific 
+  - id: input_files_sr_cram_donor_pooled
     type:
       -
         items: File
@@ -41,57 +41,33 @@ inputs:
       - .crai
     inputBinding:
       position: 3
-    doc: Short-read CRAM files for tissue (with .crai)
+    doc: Short-read CRAM files (with .crai)
 
-  - id: input_files_all_long_read_cram_donor_pooled
+  - id: input_files_tissue_descriptors_sr
     type:
       -
-        items: File
+        items: string
         type: array
         inputBinding:
-          prefix: --lr-cram
-    secondaryFiles:
-      - .crai
+          prefix: --sr-tissue
     inputBinding:
       position: 4
-    doc: PacBio + ONT CRAM files for donor (with .crai)
-
-  - id: input_files_tissue_descriptors_all_long_read
-    type:
-      -
-        items: string
-        type: array
-        inputBinding:
-          prefix: --lr-tissue
-    inputBinding:
-      position: 5
-    doc: Tissue identifiers for PacBio + ONT (1:1 match) (e.g. SMHT009-3A)
-
-  - id: input_files_types_all_long_read
-    type:
-      -
-        items: string
-        type: array
-        inputBinding:
-          prefix: --lr-type
-    inputBinding:
-      position: 6
-    doc: Sequencing type identifiers for PacBio + ONT (1:1 match) (e.g. PB ONT...)
+    doc: Tissue identifiers (e.g. SMHT009-3A)
 
   - id: output_prefix
     type: string
     default: "minipileup"
     inputBinding:
       prefix: -o
-      position: 7
+      position: 5
     doc: Output file prefix
 
   - id: additional_args
     type: string
-    default: "-c -C -Q 20 -q 30 -s 0"
+    default: "-c -C -Q 30 -q 30 -s 0"
     inputBinding:
       prefix: --args
-      position: 8 
+      position: 6
     doc: Additional minipileup args (string)
 
   - id: group_intervals
@@ -99,7 +75,7 @@ inputs:
     default: 100
     inputBinding:
       prefix: --group
-      position: 9 
+      position: 7
     doc: Group size for interval batching
 
 outputs:
@@ -112,5 +88,5 @@ outputs:
     doc: Compressed VCF with index
 
 doc: |
-  Run minipileup in parallel on multiple CRAM files (short-read, PacBio, ONT).
+  Run minipileup in parallel on multiple short-read CRAM files.
   Outputs a compressed VCF with index

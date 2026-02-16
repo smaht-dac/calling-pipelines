@@ -39,7 +39,7 @@ inputs:
       - .fai
     doc: Reference FASTA with index files
 
-  - id: input_files_pb_cram
+  - id: input_files_pb_cram_donor_pooled
     type:
       -
         items: File
@@ -67,14 +67,6 @@ inputs:
       prefix: -s
       position: 6
     doc: Donor sex (male, female, unknown)
-
-  - id: threads
-    type: int
-    default: 1 
-    inputBinding:
-      prefix: -t
-      position: 7
-    doc: Number of threads to use
 
 outputs:
   - id: output_file_vcf_gz
