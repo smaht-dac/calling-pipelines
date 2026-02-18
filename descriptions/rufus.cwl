@@ -61,8 +61,7 @@ inputs:
     type: Directory
     default:
       class: Directory
-      path: "/data1/input-mounted-smaht-wolf-application-files/RUFUS_HASH"
-      # /data1/input-mounted-smaht-production-application-files/RUFUS_HASH
+      path: "/data1/input-mounted-smaht-production-application-files/RUFUS_HASH"
     inputBinding:
       prefix: -d
     doc: Path to main bucket containing Jhash files. |
