@@ -15,9 +15,12 @@ baseCommand: [bcftools_PASS_norm_dedup.sh]
 
 inputs:
   - id: input_file_vcf_gz
-    type: File
-    inputBinding:
-      prefix: -i
+    type:
+      -
+        items: File
+        type: array
+        inputBinding:
+          prefix: -i
     secondaryFiles:
       - .tbi
     doc: Input file in VCF format. Compressed with the corresponding index file
