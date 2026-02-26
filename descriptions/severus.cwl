@@ -27,7 +27,7 @@ inputs:
   - id: input_file_cram
     type: File
     inputBinding:
-      prefix: --input
+      prefix: --target-bam
     secondaryFiles:
       - .crai
     doc: Primary input CRAM (sorted + indexed)
@@ -35,7 +35,7 @@ inputs:
   - id: tandem_repeats_bed
     type: File
     inputBinding:
-      prefix: --tandem-repeats
+      prefix: --vntr-bed
     doc: BED file with tandem repeat regions
 
   - id: nthreads
@@ -49,7 +49,7 @@ inputs:
     type: string
     default: "output.vcf.gz"
     inputBinding:
-      prefix: --vcf
+      prefix: --out-dir
     doc: Output VCF file name (.vcf.gz) [output.vcf.gz]
 
 outputs:
