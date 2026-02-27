@@ -96,3 +96,16 @@ category:
   - Variant Calling
 # Required for displaying in the file name
 code: rufus
+
+---
+
+################################################################
+# SMaHT SNV pipeline, 1.0.0
+################################################################
+name: SmahtSNV
+version: '1.0.0'
+source_url: https://github.com/smaht-dac/calling-pipelines
+category:
+  - Variant Calling
+# Required for displaying in the file name
+code: SmahtSNV
