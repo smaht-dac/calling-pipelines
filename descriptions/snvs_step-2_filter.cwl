@@ -89,6 +89,11 @@ inputs:
     default: "-c -C -Q 20 -q 30 -s 0"
     doc: Additional minipileup args (string)
 
+  - id: additional_args_sr
+    type: string
+    default: "-c -C -Q 30 -q 30 -s 0"
+    doc: Additional minipileup args sr only (string)
+
   - id: group_intervals
     type: int
     default: 100
@@ -186,8 +191,8 @@ steps:
         source: input_files_sr_cram_donor_pooled
       input_files_tissue_descriptors_sr:
         source: input_files_tissue_descriptors_sr
-      additional_args:
-        source: additional_args
+      additional_args_sr:
+        source: additional_args_sr
       group_intervals:
         source: group_intervals
     out:

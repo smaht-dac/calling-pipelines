@@ -62,7 +62,7 @@ inputs:
       position: 5
     doc: Output file prefix
 
-  - id: additional_args
+  - id: additional_args_sr
     type: string
     default: "-c -C -Q 30 -q 30 -s 0"
     inputBinding:
