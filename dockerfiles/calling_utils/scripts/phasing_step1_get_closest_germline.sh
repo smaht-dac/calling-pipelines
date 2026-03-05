@@ -27,7 +27,7 @@ done
 [[ -z ${SAMPLE-} || -z ${GERMLINE_VCF-} || -z ${SOMATIC_VCF-} ]] && { usage; exit 1; }
 
 # ---- File paths ----
-CROSSTECH_VCF="CROSSTECH.norm.vcf.gz"
+CROSSTECH_VCF="${SAMPLE}.CROSSTECH.norm.vcf.gz"
 SOMATIC_BED="${SAMPLE}.somatic_sites.bed"
 SOMATIC_5KB="${SAMPLE}.somatic_5kb.bed"
 GERM_SUBVCF="${SAMPLE}.germline.subset.vcf.gz"

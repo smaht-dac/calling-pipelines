@@ -15,7 +15,7 @@ set -euo pipefail
 usage() {
   cat <<EOF
 Usage: $0 -i input.vcf.gz -r reference.fasta [-o prefix] \\
-          [--sr-cram CRAM ...] [--pb-cram CRAM ...] [--ont-cram CRAM ...] \\
+		  [--sr-cram CRAM ...] [--lr-cram CRAM ... --lr-tissue TISSUE --lr-type PB|ONT ...] \\
           [-t threads] [--args "additional minipileup args"] [--group INT]
 
   -i             Input VCF (bgzipped) with .tbi index (required)
@@ -25,8 +25,9 @@ Usage: $0 -i input.vcf.gz -r reference.fasta [-o prefix] \\
   --args         Additional arguments to pass to minipileup (in quotes) (default: "-c -C -Q 20 -q 30 -s 0")
 
   --sr-cram      Short-read CRAM with .crai file, also accept BAM with .bai or .csi index (repeatable)
-  --pb-cram      PacBio long-read CRAM with .crai file, also accept BAM with .bai or .csi index (repeatable)
-  --ont-cram     ONT long-read CRAM with .crai file, also accept BAM with .bai or .csi index (repeatable)
+  --lr-cram      Long-read CRAM/BAM with index (repeatable)
+  --lr-tissue    Tissue ID matching each --lr-cram (repeatable) (eg SMHT005-3AF)
+  --lr-type      Sequencing type matching each --lr-cram (repeatable) (eg PB or ONT)
 
   --group        Group intervals into batches of INT for processing (default: 100)
 EOF
@@ -40,6 +41,7 @@ OUTPUT_PRFX="output"
 THREADS="$(nproc)"
 MINPILEUP_ARGS="-c -C -Q 20 -q 30 -s 0"
 GROUP=100
+
 # mapping quality (-q)
 # base quality (-Q)
 # count alleles both strands (-C)
@@ -47,8 +49,17 @@ GROUP=100
 # drop alleles with depth<INT (-s)
 
 SR_CRAMS=()
+
+# Long-read inputs (user-facing)
+LR_CRAMS=()
+LR_TISSUES=()
+LR_TYPES=()
+
+# Internal arrays (kept to minimize downstream diffs)
 PB_CRAMS=()
+PB_TISSUES=()
 ONT_CRAMS=()
+ONT_TISSUES=()
 
 # Parse args
 while [[ $# -gt 0 ]]; do
@@ -60,8 +71,9 @@ while [[ $# -gt 0 ]]; do
     --args) MINPILEUP_ARGS="$2"; shift 2;;
 
     --sr-cram) SR_CRAMS+=("$2"); shift 2;;
-    --pb-cram) PB_CRAMS+=("$2"); shift 2;;
-    --ont-cram) ONT_CRAMS+=("$2"); shift 2;;
+    --lr-cram)   LR_CRAMS+=("$2"); shift 2;;
+    --lr-tissue) LR_TISSUES+=("$2"); shift 2;;
+    --lr-type)   LR_TYPES+=("$2"); shift 2;;
 
     --group) GROUP="$2"; shift 2;;
 
@@ -83,10 +95,45 @@ done
 [[ -f "$REFERENCE_FASTA" ]] || { echo "Error: $REFERENCE_FASTA not found"; exit 1; }
 [[ -f "${REFERENCE_FASTA}.fai" ]] || { echo "Error: ${REFERENCE_FASTA}.fai not found"; exit 1; }
 
+
+# Long-read presence & 1:1:1 mapping
+(( ${#LR_CRAMS[@]} > 0 )) || { echo "Error: at least one --lr-cram required"; exit 1; }
+(( ${#LR_CRAMS[@]} == ${#LR_TISSUES[@]} )) || {
+  echo "Error: number of --lr-cram entries must equal number of --lr-tissue entries"; exit 1;
+}
+(( ${#LR_CRAMS[@]} == ${#LR_TYPES[@]} )) || {
+  echo "Error: number of --lr-cram entries must equal number of --lr-type entries"; exit 1;
+}
+
+# Route LR inputs into PB_* and ONT_* arrays (downstream code stays the same)
+for i in "${!LR_CRAMS[@]}"; do
+  t="${LR_TYPES[$i]}"
+  # normalize to uppercase for robustness
+  t_up="$(printf "%s" "$t" | tr '[:lower:]' '[:upper:]')"
+  case "$t_up" in
+    PB)
+      PB_CRAMS+=("${LR_CRAMS[$i]}")
+      PB_TISSUES+=("${LR_TISSUES[$i]}")
+      ;;
+    ONT)
+      ONT_CRAMS+=("${LR_CRAMS[$i]}")
+      ONT_TISSUES+=("${LR_TISSUES[$i]}")
+      ;;
+    *)
+      echo "Error: invalid --lr-type '$t' for --lr-cram '${LR_CRAMS[$i]}'. Expected 'PB' or 'ONT'."
+      exit 1
+      ;;
+  esac
+done
+
+
+(( ${#PB_CRAMS[@]} > 0 )) || { echo "Error: at least one PB long-read (--lr-type PB) required"; exit 1; }
+
+
 # CRAM/BAM checks (index check too)
 ALL_CRAMS=("${SR_CRAMS[@]}" "${PB_CRAMS[@]}" "${ONT_CRAMS[@]}")
 if (( ${#ALL_CRAMS[@]} == 0 )); then
-  echo "Error: no BAM/CRAM files provided. Please specify at least one with --sr-cram/--pb-cram/--ont-cram"
+  echo "Error: no BAM/CRAM files provided. Please specify at least one with --sr-cram/--lr-cram"
   exit 1
 else
   for b in "${ALL_CRAMS[@]}"; do
@@ -109,6 +156,7 @@ else
     fi
   done
 fi
+
 
 # Tool checks
 command -v bcftools >/dev/null 2>&1 || { echo "Error: bcftools not found in PATH"; exit 1; }
@@ -140,6 +188,10 @@ HEADER_VCF="${WORKDIR}/header.vcf"
 # Extract intervals from VCF
 echo "Extracting intervals to file..."
 bcftools query -f '%CHROM:%POS-%END\n' "$INPUT_VCF" > "$INTERVALS"
+if [[ ! -s "$INTERVALS" ]]; then
+  echo "Error: input VCF contains no valid variants" >&2
+  exit 1
+fi
 
 # Group intervals into batches (to reduce overhead)
 GROUPED="${WORKDIR}/intervals_grouped.txt"
@@ -152,8 +204,6 @@ awk -v n="$GROUP" '
 END { if (line != "") print line }
 ' "$INTERVALS" > "$GROUPED"
 
-# Safety check
-[[ -s "$GROUPED" ]] || { echo "Error: grouped intervals file is empty"; exit 1; }
 
 # Create run function
 run_region() {
@@ -206,11 +256,36 @@ run_region() {
       BAMS+=("$bam")
     done
 
-    # Run minipileup for this region
+    # Run minipileup for this region (avoid piping so segfault can't break the shell pipeline)
+    local tmp_out="${WORKDIR}/minipileup_${rsafe}.$$.$RANDOM.out"
+
+    set +e
     minipileup -f "$REFERENCE_FASTA" \
       $MINPILEUP_ARGS \
       -r "$region" \
-      "${BAMS[@]}" | grep -v '^#' >> "$group_vcf" || true
+      "${BAMS[@]}" > "$tmp_out"
+    mp_status=$?
+    set -e
+
+    if [[ $mp_status -eq 139 ]]; then
+      echo "Seg fault at $region" >&2
+      rm -f "$tmp_out"
+      for b in "${BAMS[@]}"; do rm -f "$b" "${b}.csi"; done
+      continue
+    elif [[ $mp_status -ne 0 ]]; then
+      # keep prior behavior: don't kill the overall job on other minipileup failures
+      rm -f "$tmp_out"
+      true
+    else
+      grep -v '^#' "$tmp_out" >> "$group_vcf" || true
+      rm -f "$tmp_out"
+    fi
+
+    ## Run minipileup for this region
+    #minipileup -f "$REFERENCE_FASTA" \
+    #  $MINPILEUP_ARGS \
+    #  -r "$region" \
+    #  "${BAMS[@]}" | grep -v '^#' >> "$group_vcf" || true
 
     # Cleanup per-region BAMs
     for b in "${BAMS[@]}"; do rm -f "$b" "${b}.csi"; done
@@ -221,34 +296,45 @@ run_region() {
 export -f run_region
 export WORKDIR REFERENCE_FASTA MINPILEUP_ARGS HEADER_VCF
 
-# Create temporary VCF file with header only
-echo "Creating temporary VCF with header..."
-read -r first_line < "$GROUPED"
-run_region "$first_line" 1 "${ALL_CRAMS[@]}"
+export MERGED_VCF="${WORKDIR}/merged.vcf"
+export SORTED_VCF="${WORKDIR}/sorted.vcf"
 
-[[ -s "$HEADER_VCF" ]] || { echo "Error: header not generated"; exit 1; }
+# Safety check
+if [[ ! -s "$GROUPED" ]]; then
+    echo "Error: interval grouping produced empty output (unexpected). Check awk/group settings." >&2
+    exit 1
+    # echo "Error: grouped intervals file is empty"
+    # run_region chr1:10001-10001 1 "${ALL_CRAMS[@]}"
 
-# Parallel execution
-echo "Running minipileup in parallel on intervals..."
-grep -Ev '^[[:space:]]*($|#)' "$GROUPED" | \
-xargs -P "$THREADS" -I{} bash -c 'run_region "$1" "$2" "${@:3}"' _ \
-  "{}" 0 "${ALL_CRAMS[@]}" || { echo "Error: parallel minipileup execution failed"; exit 1; }
+    # cat "$HEADER_VCF" > "$MERGED_VCF"
+else
+    # Create temporary VCF file with header only
+    echo "Creating temporary VCF with header..."
+    read -r first_line < "$GROUPED"
+    run_region "$first_line" 1 "${ALL_CRAMS[@]}"
+    
+    [[ -s "$HEADER_VCF" ]] || { echo "Error: header not generated"; exit 1; }
+    
+    # Parallel execution
+    echo "Running minipileup in parallel on intervals..."
+    grep -Ev '^[[:space:]]*($|#)' "$GROUPED" | \
+    xargs -P "$THREADS" -I{} bash -c 'run_region "$1" "$2" "${@:3}"' _ \
+      "{}" 0 "${ALL_CRAMS[@]}" || { echo "Error: parallel minipileup execution failed"; exit 1; }
+    
+    # Collect shard outputs (sorted, safe if none)
+    shopt -s nullglob
+    mapfile -t SHARDS < <(printf "%s\n" "$WORKDIR"/*.group.vcf)
+    shopt -u nullglob
+    (( ${#SHARDS[@]} > 0 )) || { echo "Error: no grouped outputs found in $WORKDIR"; exit 1; }
+    
+    echo "Merging ${#SHARDS[@]} annotated groups..."
+    
+    # Write header once
+    cat "$HEADER_VCF" > "$MERGED_VCF"
+    # Append all shard bodies
+    cat "${SHARDS[@]}" >> "$MERGED_VCF"
 
-# Collect shard outputs (sorted, safe if none)
-shopt -s nullglob
-mapfile -t SHARDS < <(printf "%s\n" "$WORKDIR"/*.group.vcf)
-shopt -u nullglob
-(( ${#SHARDS[@]} > 0 )) || { echo "Error: no grouped outputs found in $WORKDIR"; exit 1; }
-
-# Merging annotated groups using bcftools
-echo "Merging ${#SHARDS[@]} annotated groups..."
-MERGED_VCF="${WORKDIR}/merged.vcf"
-SORTED_VCF="${WORKDIR}/sorted.vcf"
-
-# Write header once
-cat "$HEADER_VCF" > "$MERGED_VCF"
-# Append all shard bodies
-cat "${SHARDS[@]}" >> "$MERGED_VCF"
+fi
 
 echo "-- BCFTools ---------------------------"
 bcftools sort -T "tmp_bcftools.XXXXXX" -O v -o "$SORTED_VCF" "$MERGED_VCF" \
@@ -257,23 +343,43 @@ echo "-----------------------------------------"
 
 [[ -s "$SORTED_VCF" ]] || { echo "Error: sorted VCF is empty"; exit 1; }
 
-# Write files to rename sample and add file type information
+# Write files to rename sample and add file type information (+ PB tissue metadata)
 : > "${WORKDIR}/map.txt"
-for cram in "${SR_CRAMS[@]}";  do printf "%s\tSR\n"  "$(basename "${cram%.*}")" >> "${WORKDIR}/map.txt"; done
-for cram in "${PB_CRAMS[@]}";  do printf "%s\tPB\n"  "$(basename "${cram%.*}")" >> "${WORKDIR}/map.txt"; done
-for cram in "${ONT_CRAMS[@]}"; do printf "%s\tONT\n" "$(basename "${cram%.*}")" >> "${WORKDIR}/map.txt"; done
+
+for cram in "${SR_CRAMS[@]}"; do
+  printf "%s\tSR\t.\n" "$(basename "${cram%.*}")" >> "${WORKDIR}/map.txt"
+done
+
+for i in "${!PB_CRAMS[@]}"; do
+  cram="${PB_CRAMS[$i]}"
+  tissue="${PB_TISSUES[$i]}"
+  printf "%s\tPB\t%s\n" "$(basename "${cram%.*}")" "$tissue" >> "${WORKDIR}/map.txt"
+done
+
+
+for i in "${!ONT_CRAMS[@]}"; do
+  cram="${ONT_CRAMS[$i]}"
+  tissue="${ONT_TISSUES[$i]}"
+  printf "%s\tONT\t%s\n" "$(basename "${cram%.*}")" "$tissue" >> "${WORKDIR}/map.txt"
+done
+
+
 
 # Granite to rename the sample and add file type information
 py_script="
 from granite.lib import vcf_parser
 import os, re, sys
 
-# Load the mapping file: sample_basename -> SR/PB/ONT
+# Load mapping: sample_basename -> (SR/PB/ONT, pb_tissue or '')
 sample_map = {}
 with open('${WORKDIR}/map.txt', 'r') as f:
     for line in f:
-        sample, ftype = line.strip().split('\t')
-        sample_map[sample] = ftype
+        parts = line.rstrip('\n').split('\t')
+        sample, ftype, tissue = parts[0], parts[1], parts[2]
+        if tissue == '.':
+            sample_map[sample] = ftype
+        else:
+            sample_map[sample] = '-'.join([ftype, tissue])
 
 # Load the VCF
 vcf_obj = vcf_parser.Vcf('${SORTED_VCF}')

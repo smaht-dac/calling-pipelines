@@ -318,3 +318,45 @@ type:
 # Required to enable sync with a reference bucket
 uuid: c017c0fb-cf44-400e-b724-ad5688316687
 accession: SMAFI5XP7A1K
+
+---
+
+################################################################
+#  "Difficult" Regions BED file
+#  Gzipped BED file with list of regions classified as difficult
+#  based on regions in PanMask strict (pm151b) regions but not
+#  in 1KG strict regions
+################################################################
+name: difficult-regions-smaht
+description: Difficult regions BED file. |
+             Build hg38/GRCh38
+format: bed_gz
+version: 'v2_GRCh38'
+category:
+  - Genome Region
+type:
+  - Sequence Interval
+# Required to enable sync with a reference bucket
+uuid: 3bd6d7ce-34b3-4ee3-93fb-d349dbc3b229
+accession: SMAFI21GXAHZ
+
+---
+
+################################################################
+#  "Extreme" Regions BED file
+#  Gzipped BED file with list of regions classified as extreme
+#  based on regions outside of the PanMask strict (pm151b)
+#  regions
+################################################################
+name: extreme-regions-smaht
+description: Extreme regions BED file. |
+             Build hg38/GRCh38
+format: bed_gz
+version: 'v2_GRCh38'
+category:
+  - Genome Region
+type:
+  - Sequence Interval
+# Required to enable sync with a reference bucket
+uuid: 702ed3fa-b877-4c9d-851b-44abd5fd9886
+accession: SMAFIC18XSH3

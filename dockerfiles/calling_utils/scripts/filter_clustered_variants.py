@@ -2,34 +2,38 @@
 import argparse
 import pysam
 
+
 def filter_clustered(input_vcf, output_vcf, window=50):
     vcf_in = pysam.VariantFile(input_vcf)
     vcf_out = pysam.VariantFile(output_vcf, "w", header=vcf_in.header)
 
-    last_rec = None
-    last_clustered = False
+    group = []            # records in the current proximity group
+    group_clustered = False
+    prev = None
 
     for rec in vcf_in.fetch():
-        if last_rec and rec.chrom == last_rec.chrom and rec.pos - last_rec.pos <= window:
-            # Cluster detected: drop last and current
-            last_clustered = True
-            continue
+        if prev is None or rec.chrom != prev.chrom or rec.pos - prev.pos > window:
+            # group ended; flush previous group
+            if group and not group_clustered:
+                vcf_out.write(group[0])   # singleton group only
+            # start new group
+            group = [rec]
+            group_clustered = False
         else:
-            # If the previous one was not clustered, write it out
-            if last_rec and not last_clustered:
-                vcf_out.write(last_rec)
-            last_rec = rec
-            last_clustered = False
+            # still in the same group (adjacent within window)
+            group.append(rec)
+            group_clustered = True
 
-    # Flush last record if safe
-    if last_rec and not last_clustered:
-        vcf_out.write(last_rec)
+        prev = rec
+
+    # flush last group
+    if group and not group_clustered:
+        vcf_out.write(group[0])
 
     vcf_in.close()
     vcf_out.close()
 
-    if output_vcf.endswith(".gz"):
-        pysam.tabix_index(output_vcf, preset="vcf", force=True)
+    if output_vcf.endswith(".gz"): pysam.tabix_index(output_vcf,preset="vcf", force=True)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Remove clustered variants (SNVs + indels) within N bp")

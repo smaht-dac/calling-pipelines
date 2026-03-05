@@ -6,6 +6,7 @@
 import argparse, sys
 import pysam
 import math
+import re
 from datetime import datetime
 from scipy.stats import fisher_exact
 
@@ -73,15 +74,15 @@ def get_read_cutoffs(SR_cov: int, PB_cov: int,
                 return r
         return cov
 
-    # independent cutoffs
-    SR_cutoff = find_cutoff(SR_cov, error_rate, target_p)
+    # independent cutoffs (hard code strict cutoff!)
+    SR_cutoff = find_cutoff(SR_cov, error_rate, 1e-5)
 
     # combined cutoff using total coverage
     total_cov = SR_cov + PB_cov
     combined_total = find_cutoff(total_cov, error_rate, target_p)
 
     # distribute proportionally to coverage, ensure ≥1 of each
-    combined_SR = max(1, round(SR_cov / total_cov * combined_total))
+    combined_SR = max(1, round(SR_cov / total_cov * float(combined_total)))
     combined_PB = max(1, combined_total - combined_SR)
 
     return dict(
@@ -135,11 +136,15 @@ class MinipileupVCF:
     Counts are stored per sample as a SampleCounts object.
     Also aggregate counts by group: SR (Short-reads), PB (PacBio), ONT (Oxford Nanopore).
     """
-    def __init__(self, vcf_path: str, original_vcf: OriginalVCF):
+    def __init__(self, vcf_path: str, original_vcf: OriginalVCF, current_tissue: str):
         self.vcf_path = vcf_path
         self.original_vcf = original_vcf
+        self.current_tissue = current_tissue
+
         self.counts = dict()  # (chrom, pos, ref, alt) -> {sample: SampleCounts, ...}
         self.aggregate_counts = dict() # (chrom, pos, ref, alt) -> {PB: SampleCounts, SR: SampleCounts, ONT: SampleCounts}
+        self.tissue_pb_counts = dict()  # (chrom,pos,ref,alt) -> SampleCounts("PB_TISSUE")
+        self.tissue_ont_counts = dict()  # (chrom,pos,ref,alt) -> SampleCounts("ONT_TISSUE")
 
         self.load_records()
         self.aggregate_by_group()
@@ -213,7 +218,9 @@ class MinipileupVCF:
                         # Select correct ALT index
                         i = self.select_alt_index(record, ALT)
                         if i is None:
-                            sys.exit(f"ERROR: Could not find ALT {ALT} in record at {record.chrom}:{record.pos} with ALTs {record.alts}")
+                            # not found in minipileup alts, remove variant
+                            sys.stderr.write(f"ERROR: Could not find ALT {ALT} in record at {record.chrom}:{record.pos}\n")
+                            continue
                         # Get counts for all samples
                         for sample in record.samples:
                             sc = self.add_counts(record, sample, i)
@@ -221,26 +228,62 @@ class MinipileupVCF:
                             self.counts.setdefault(key, dict())[sample] = sc
 
     def aggregate_by_group(self):
-        """Aggregate counts by group:
-        SR (Short-reads), PB (PacBio), ONT (Oxford Nanopore).
         """
+        Aggregate counts by group:
+        SR (Short-reads), PB (PacBio), ONT (Oxford Nanopore).
+
+        Also compute tissue-specific PB counts (PB_TISSUE) using only samples
+        that end with: -PB-<current_tissue> when current_tissue is provided.
+        """
+        pb_pat = re.compile(r'-PB(?:-|$)')  # matches ...-PB or ...-PB-...
+        ont_pat = re.compile(r'-ONT(?:-|$)')  # matches ...-ONT or ...-ONT-...
+
         for key, counts_ in self.counts.items():
             agg = dict(
                     SR=SampleCounts("SR"),
                     PB=SampleCounts("PB"),
                     ONT=SampleCounts("ONT")
             )
+
+            tissue_pb = SampleCounts("PB_TISSUE")
+            tissue_ont = SampleCounts("ONT_TISSUE")
+
             for sample, sc in counts_.items():
                 if sample.endswith("-SR"): group = "SR"
-                elif sample.endswith("-PB"): group = "PB"
-                elif sample.endswith("-ONT"): group = "ONT"
+                elif pb_pat.search(sample): group = "PB"
+                elif ont_pat.search(sample): group = "ONT"
                 else:
                     sys.exit(f"ERROR: Sample {sample} does not end with -SR, -PB, or -ONT. Cannot determine group")
                 agg[group].REF_ADF += sc.REF_ADF
                 agg[group].REF_ADR += sc.REF_ADR
                 agg[group].ALT_ADF += sc.ALT_ADF
                 agg[group].ALT_ADR += sc.ALT_ADR
+
+                # Additionally aggregate tissue-matched PB only
+                if (
+                    group == "PB"
+                    and self.current_tissue
+                    and sample.endswith(f"-PB-{self.current_tissue}")
+                ):
+                    tissue_pb.REF_ADF += sc.REF_ADF
+                    tissue_pb.REF_ADR += sc.REF_ADR
+                    tissue_pb.ALT_ADF += sc.ALT_ADF
+                    tissue_pb.ALT_ADR += sc.ALT_ADR
+
+                if (
+                    group == "ONT"
+                    and self.current_tissue
+                    and sample.endswith(f"-ONT-{self.current_tissue}")
+                ):
+                    tissue_ont.REF_ADF += sc.REF_ADF
+                    tissue_ont.REF_ADR += sc.REF_ADR
+                    tissue_ont.ALT_ADF += sc.ALT_ADF
+                    tissue_ont.ALT_ADR += sc.ALT_ADR
+
             self.aggregate_counts[key] = agg
+            self.tissue_pb_counts[key] = tissue_pb
+            self.tissue_ont_counts[key] = tissue_ont
+
 
 #*******************************************************************************
 # Tiering and filtering variants
@@ -299,25 +342,27 @@ class TieredVCF:
         # Only store TIER1 and TIER2 variants, others are not in dict
         self.definitions = [
             # CrossTech classification
-            '##INFO=<ID=CrossTech,Number=0,Type=Flag,Description="Alt supported in both short-read and PacBio (long-read) data at or above their combined thresholds">',
+            '##INFO=<ID=CrossTech,Number=0,Type=Flag,Description="Alt supported in both short read and PacBio data at or above their combined thresholds">',
             '##INFO=<ID=CrossCaller,Number=0,Type=Flag,Description="Alt found in more than one variant caller">',
             # CALLERS
             '##INFO=<ID=CALLERS,Number=.,Type=String,Description="List of variant callers that reported this variant">',
             # Fisher strand bias
             '##INFO=<ID=SB_PVAL,Number=1,Type=Float,Description="Fisher exact test p-value for strand balance on the selected platform">',
-            '##INFO=<ID=SB_SRC,Number=1,Type=String,Description="Platform used for Fisher strand test: SR (short-read) or PB (PacBio long-read)">',
+            '##INFO=<ID=SB_SRC,Number=1,Type=String,Description="Platform used for Fisher strand test: SR (short read) or PB (PacBio long-read)">',
             # Binomial germline deviation
-            '##INFO=<ID=GLM_PVAL,Number=1,Type=Float,Description="Minimum binomial p-value for germline deviation across all platforms tested">',
-            '##INFO=<ID=GLM_PVAL_SR,Number=1,Type=Float,Description="Binomial p-value for germline deviation in short-read data">',
-            '##INFO=<ID=GLM_PVAL_PB,Number=1,Type=Float,Description="Binomial p-value for germline deviation in PacBio (long-read) data">',
-            '##INFO=<ID=GLM_PVAL_ONT,Number=1,Type=Float,Description="Binomial p-value for germline deviation in Oxford Nanopore (long-read) data">',
+            '##INFO=<ID=GERMLINE_PVAL,Number=1,Type=Float,Description="Minimum binomial p-value for germline deviation across all platforms tested">',
+            '##INFO=<ID=GERMLINE_PVAL_SR,Number=1,Type=Float,Description="Binomial p-value for germline deviation in short read data">',
+            '##INFO=<ID=GERMLINE_PVAL_PB,Number=1,Type=Float,Description="Binomial p-value for germline deviation in PacBio (long-read) data">',
+            '##INFO=<ID=GERMLINE_PVAL_ONT,Number=1,Type=Float,Description="Binomial p-value for germline deviation in Oxford Nanopore (long-read) data">',
             # Raw strand-specific counts
             '##INFO=<ID=SR_ADF,Number=2,Type=Integer,Description="Short-read forward depths (REF, ALT)">',
             '##INFO=<ID=SR_ADR,Number=2,Type=Integer,Description="Short-read reverse depths (REF, ALT)">',
             '##INFO=<ID=PB_ADF,Number=2,Type=Integer,Description="PacBio (long-read) forward depths (REF, ALT)">',
             '##INFO=<ID=PB_ADR,Number=2,Type=Integer,Description="PacBio (long-read) reverse depths (REF, ALT)">',
             '##INFO=<ID=ONT_ADF,Number=2,Type=Integer,Description="Oxford Nanopore (long-read) forward depths (REF, ALT)">',
-            '##INFO=<ID=ONT_ADR,Number=2,Type=Integer,Description="Oxford Nanopore (long-read) reverse depths (REF, ALT)">'
+            '##INFO=<ID=ONT_ADR,Number=2,Type=Integer,Description="Oxford Nanopore (long-read) reverse depths (REF, ALT)">',
+            '##INFO=<ID=TISSUE_PB_VAF,Number=1,Type=Float,Description="PacBio VAF computed using only tissue-matched PB sample(s)">',
+            '##INFO=<ID=TISSUE_ONT_VAF,Number=1,Type=Float,Description="ONT VAF computed using only tissue-matched ONT sample(s)">'
         ]
 
         self.filter_variants()
@@ -507,6 +552,26 @@ class TieredVCF:
                     record.info["PB_ADR"] = [agg["PB"].REF_ADR, agg["PB"].ALT_ADR]
                     record.info["ONT_ADF"] = [agg["ONT"].REF_ADF, agg["ONT"].ALT_ADF]
                     record.info["ONT_ADR"] = [agg["ONT"].REF_ADR, agg["ONT"].ALT_ADR]
+
+                    # Add tissue-matched PB VAF if available
+                    tpb = self.minipileup_vcf.tissue_pb_counts.get(key)
+                    if tpb is not None:
+                        tpb_ref = tpb.REF_ADF + tpb.REF_ADR
+                        tpb_alt = tpb.ALT_ADF + tpb.ALT_ADR
+                        tpb_total = tpb_ref + tpb_alt
+                        if tpb_total > 0:
+                            record.info["TISSUE_PB_VAF"] = float(tpb_alt) / float(tpb_total)
+
+                    # Add tissue-matched ONT VAF if available
+                    tont = self.minipileup_vcf.tissue_ont_counts.get(key)
+                    if tont is not None:
+                        tont_ref = tont.REF_ADF + tont.REF_ADR
+                        tont_alt = tont.ALT_ADF + tont.ALT_ADR
+                        tont_total = tont_ref + tont_alt
+                        if tont_total > 0:
+                            record.info["TISSUE_ONT_VAF"] = float(tont_alt) / float(tont_total)
+
+
                     # Add Fisher test results to INFO fields
                     record.info["SB_PVAL"] = fisher_result.p_value
                     record.info["SB_SRC"] = fisher_result.group
@@ -514,18 +579,18 @@ class TieredVCF:
                     glm_pvals = []
                     if binom_result.p_value_SR is not None:
                         if tier == "TIER2":
-                            record.info["GLM_PVAL_SR"] = binom_result.p_value_SR
+                            record.info["GERMLINE_PVAL_SR"] = binom_result.p_value_SR
                             glm_pvals.append(binom_result.p_value_SR)
                     if binom_result.p_value_PB is not None:
                         if tier == "TIER1":
-                            record.info["GLM_PVAL_PB"] = binom_result.p_value_PB
+                            record.info["GERMLINE_PVAL_PB"] = binom_result.p_value_PB
                             glm_pvals.append(binom_result.p_value_PB)
                     if binom_result.p_value_ONT is not None:
                         if tier == "TIER1":
-                            record.info["GLM_PVAL_ONT"] = binom_result.p_value_ONT
+                            record.info["GERMLINE_PVAL_ONT"] = binom_result.p_value_ONT
                             glm_pvals.append(binom_result.p_value_ONT)
                     if glm_pvals:
-                        record.info["GLM_PVAL"] = min(glm_pvals)
+                        record.info["GERMLINE_PVAL"] = min(glm_pvals)
                     # Write record
                     vf_out.write(record)
                     written += 1
@@ -545,6 +610,8 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--minipileup_vcf", required=True, help="Minipileup VCF with ADF/ADR counts. Compressed (.vcf.gz) or uncompressed (.vcf) VCF")
     parser.add_argument("-o", "--output_vcf", required=True, help="Output VCF with tiered and filtered variants. Compressed (.vcf.gz) or uncompressed (.vcf) VCF")
 
+    parser.add_argument("--current_tissue",default=None,help="Tissue ID for this run (e.g. SMHT005-3AF). Used to compute TISSUE_PB_VAF from samples named *-PB-<current_tissue>.")
+
     parser.add_argument("--strand_alpha", type=float, default=0.01,
                     help="Keep if Fisher p >= this (default: 0.01)")
     parser.add_argument("--germline_alpha", type=float, default=0.01,
@@ -561,7 +628,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     ovcf  = OriginalVCF(args.input_vcf)
-    mpvcf = MinipileupVCF(args.minipileup_vcf, ovcf)
+    mpvcf = MinipileupVCF(args.minipileup_vcf, ovcf, current_tissue=args.current_tissue)
     tvcf  = TieredVCF(
         ovcf, mpvcf,
         strand_alpha=args.strand_alpha,
