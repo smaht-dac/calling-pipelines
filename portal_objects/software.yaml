@@ -109,3 +109,16 @@ category:
   - Variant Calling
 # Required for displaying in the file name
 code: SmahtSNV
+
+---
+
+################################################################
+# Severus, v1.6
+################################################################
+name: Severus
+version: 'v1.6'
+source_url: https://github.com/KolmogorovLab/Severus
+category:
+  - Variant Calling
+# Required for displaying in the file name
+code: severus
