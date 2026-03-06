@@ -360,3 +360,21 @@ type:
 # Required to enable sync with a reference bucket
 uuid: 702ed3fa-b877-4c9d-851b-44abd5fd9886
 accession: SMAFIC18XSH3
+
+---
+
+################################################################
+# Tandem repeat regions for Severus, GRCh38
+################################################################
+name: severus-tandem-repeat-regions
+description: Tandem repeat regions for Severus. |
+             Build hg38/GRCh38
+format: bed
+version: 'GRCh38'
+category:
+  - Genome Region
+type:
+  - Sequence Interval
+# Required to enable sync with a reference bucket
+uuid: 1ed7f234-9c15-4cb8-a877-c5eab5f4b441
+accession: SMAFI5ABC123
