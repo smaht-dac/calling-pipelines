@@ -22,6 +22,13 @@ inputs:
       - .crai
     doc: Primary input CRAM (sorted + indexed)
 
+  - id: output_dir
+    type: string
+    default: "."
+    inputBinding:
+      prefix: --out-dir
+    doc: Output directory
+
   - id: tandem_repeats_bed
     type: File
     inputBinding:
@@ -34,13 +41,6 @@ inputs:
     inputBinding:
       prefix: -t
     doc: Number of threads to use [16]
-
-  - id: output_dir
-    type: string
-    default: "."
-    inputBinding:
-      prefix: --out-dir
-    doc: Output directory
 
 outputs:
   - id: output_file_vcf
