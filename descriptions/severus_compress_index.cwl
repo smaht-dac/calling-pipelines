@@ -10,8 +10,6 @@ requirements:
 inputs:
   - id: input_file_cram
     type: File
-    inputBinding:
-      prefix: --target-bam
     secondaryFiles:
       - .crai
     doc: Primary input CRAM (sorted + indexed)
@@ -19,16 +17,12 @@ inputs:
   # Reference file
   - id: tandem_repeats_bed
     type: File
-    inputBinding:
-      prefix: --vntr-bed
     doc: BED file with tandem repeat regions
 
   # Optional arguments
   - id: nthreads
     type: int
     default: 16
-    inputBinding:
-      prefix: -t
     doc: Number of threads to use [16]
 
 outputs:
