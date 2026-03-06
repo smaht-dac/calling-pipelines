@@ -2,8 +2,8 @@
 #     General information for the workflow
 #############################################################
 name: severus_compress_index
-description: SNV and Indel calling using Severus. |
-             Calls somatic variants from long-read sequencing data in CRAM format. |
+description: SV calling using Severus. |
+             Calls variants from long-read sequencing data in CRAM format. |
              Accepts a CRAM file as input (required).
 
 runner:
