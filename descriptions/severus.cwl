@@ -19,7 +19,7 @@ inputs:
     inputBinding:
       prefix: --target-bam
     secondaryFiles:
-      - .bai
+      - .crai
     doc: Primary input CRAM (sorted + indexed)
 
   - id: tandem_repeats_bed
