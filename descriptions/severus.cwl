@@ -1,14 +1,5 @@
 #!/usr/bin/env cwl-runner
 
-
-# severus
-# --target-bam $single_Bam
-# --out-dir ${outputDir}/${outputFile}
-# --vntr-bed $tandem_repeat_bed
-# -t 16
-# --min-sv-size 50
-
-
 cwlVersion: v1.0
 class: CommandLineTool
 
@@ -19,7 +10,6 @@ requirements:
 
 baseCommand: [severus]
 arguments: [
-    "-t", "16",
     "--min-sv-size", "50"
 ]
 
@@ -29,7 +19,7 @@ inputs:
     inputBinding:
       prefix: --target-bam
     secondaryFiles:
-      - .crai
+      - .bai
     doc: Primary input CRAM (sorted + indexed)
 
   - id: tandem_repeats_bed
@@ -42,23 +32,22 @@ inputs:
     type: int
     default: 16
     inputBinding:
-      prefix: --threads
+      prefix: -t
     doc: Number of threads to use [16]
 
-  - id: output_file_name
+  - id: output_dir
     type: string
-    default: "output.vcf.gz"
+    default: "."
     inputBinding:
       prefix: --out-dir
-    doc: Output VCF file name (.vcf.gz) [output.vcf.gz]
+    doc: Output directory
 
 outputs:
-  - id: output_file_vcf_gz
+  - id: output_file_vcf
     type: File
     outputBinding:
-      glob: $(inputs.output_file_name)
-    secondaryFiles:
-      - .tbi
+      glob: $(inputs.output_dir + "/all_SVs/severus_all.vcf")
+    doc: VCF is output as ./all_SVs/severus_all.vcf
 
 doc: |
   Severus structural variant calling on long-read sequencing data (PacBio HiFi / ONT).
