@@ -1,7 +1,7 @@
 ## Workflow information #####################################
 #     General information for the workflow
 #############################################################
-name: delly
+name: delly_lr
 description: Run Delly on long-read data (PacBio and ONT). |
              Produce structural variant calls in VCF format.  |
              Accept a single long-read CRAM file as input
@@ -29,7 +29,7 @@ input:
     argument_type: file.fa
   
   # Required parameter arguments
-  sample_name:
+  output_file_prefix:
     argument_type: parameter.string
 
 
