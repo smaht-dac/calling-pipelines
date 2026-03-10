@@ -32,4 +32,4 @@ delly lr -g "$reference_fasta" -o "${output_file_prefix}.bcf" "$long_read_input"
 # **********************************************
 
 bcftools view -Oz -o "${output_file_prefix}.vcf.gz" "${output_file_prefix}.bcf"
-tabix -p vcf $output_file_prefix.vcf.gz
+tabix -p vcf "${output_file_prefix}.vcf.gz"
