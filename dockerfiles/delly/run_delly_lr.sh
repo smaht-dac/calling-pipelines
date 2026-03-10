@@ -25,11 +25,11 @@ done
 # 1. Run Delly long-read command line
 # **********************************************
 
-delly lr -g ${reference_fasta} -o ${output_file_prefix}.bcf ${long_read_input} || { echo "Error: delly lr failed"; exit 1; }
+delly lr -g "$reference_fasta" -o "${output_file_prefix}.bcf" "$long_read_input" || { echo "Error: delly lr failed"; exit 1; }
 
 # **********************************************
 # 2. Convert Delly long-read output to compressed vcf and index
 # **********************************************
 
-bcftools view -Oz -o $output_file_prefix.vcf.gz $output_file_prefix.bcf || { echo "Error: bcftools view failed"; exit 1; }
-tabix -p vcf $output_file_prefix.vcf.gz || { echo "Error: tabix failed"; exit 1; }
+bcftools view -Oz -o "${output_file_prefix}.vcf.gz" "${output_file_prefix}.bcf" || { echo "Error: bcftools view failed"; exit 1; }
+tabix -p vcf "${output_file_prefix}.vcf.gz" || { echo "Error: tabix failed"; exit 1; }
