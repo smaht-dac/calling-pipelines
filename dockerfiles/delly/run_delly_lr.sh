@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 ## Command line arguments
 while getopts ":n:r:l:" opt; do
@@ -24,11 +25,20 @@ done
 # 1. Run Delly long-read command line
 # **********************************************
 
+<<<<<<< HEAD
 delly lr -g ${reference_fasta} -o ${output_file_prefix}.bcf ${long_read_input} || { echo "Error: delly lr failed"; exit 1; }
+=======
+delly lr -g "$reference_fasta" -o "${output_file_prefix}.bcf" "$long_read_input"
+>>>>>>> 9ac13fd266531a782c85118a34eb56a9e02f6352
 
 # **********************************************
 # 2. Convert Delly long-read output to compressed vcf and index
 # **********************************************
 
+<<<<<<< HEAD
 bcftools view -Oz -o $output_file_prefix.vcf.gz $output_file_prefix.bcf || { echo "Error: bcftools view failed"; exit 1; }
 tabix -p vcf $output_file_prefix.vcf.gz || { echo "Error: tabix failed"; exit 1; }
+=======
+bcftools view -Oz -o "${output_file_prefix}.vcf.gz" "${output_file_prefix}.bcf"
+tabix -p vcf "${output_file_prefix}.vcf.gz"
+>>>>>>> 9ac13fd266531a782c85118a34eb56a9e02f6352
