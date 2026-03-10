@@ -31,5 +31,5 @@ delly lr -g "$reference_fasta" -o "${output_file_prefix}.bcf" "$long_read_input"
 # 2. Convert Delly long-read output to compressed vcf and index
 # **********************************************
 
-bcftools view -Oz -o $output_file_prefix.vcf.gz $output_file_prefix.bcf
+bcftools view -Oz -o "${output_file_prefix}.vcf.gz" "${output_file_prefix}.bcf"
 tabix -p vcf $output_file_prefix.vcf.gz
