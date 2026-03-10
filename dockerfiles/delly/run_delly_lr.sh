@@ -25,7 +25,7 @@ done
 # 1. Run Delly long-read command line
 # **********************************************
 
-delly lr -g ${reference_fasta} -o ${output_file_prefix}.bcf ${long_read_input}
+delly lr -g "$reference_fasta" -o "${output_file_prefix}.bcf" "$long_read_input"
 
 # **********************************************
 # 2. Convert Delly long-read output to compressed vcf and index
