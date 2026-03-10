@@ -19,9 +19,7 @@ inputs:
     doc: Output file name prefix
 
   - id: input_file_long_cram
-    type: 
-      - 
-        type: File
+    type: File
     secondaryFiles:
       - .crai
     inputBinding:

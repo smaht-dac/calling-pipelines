@@ -12,6 +12,7 @@ runner:
 
 software:
   - Delly@v.1.5.0
+  - Bcftools@1.17
 
 category:
   - Variant Calling

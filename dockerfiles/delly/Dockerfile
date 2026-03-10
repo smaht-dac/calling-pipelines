@@ -7,7 +7,7 @@ LABEL maintainers="Charlotte Zhang (charlotte_zhang@hms.harvard.edu), Michele Be
 
 #######################################################################
 #     General updates & installing necessary Linux components
-#       - libncurses-dev, libbz2-dev, liblzma-dev used by samtools
+#       - libncurses-dev, libbz2-dev, liblzma-dev used by bcftools
 #######################################################################
 RUN apt-get update -y && apt-get install -y \
     locales \
