@@ -19,7 +19,7 @@ inputs:
       prefix: -n
     doc: Output file name prefix
 
-  - id: input_file_long_cram
+  - id: input_file_cram
     type: File
     secondaryFiles:
       - .crai
