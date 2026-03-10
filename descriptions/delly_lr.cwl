@@ -14,6 +14,7 @@ baseCommand: [run_delly_lr.sh]
 inputs:
   - id: output_file_prefix
     type: string
+    default: "out"
     inputBinding:
       prefix: -n
     doc: Output file name prefix
@@ -41,7 +42,7 @@ outputs:
     secondaryFiles:
       - .tbi
     outputBinding:
-      glob: $(inputs.output_file_prefix + "-Delly-LR.vcf.gz")
+      glob: $(inputs.output_file_prefix + ".vcf.gz")
 
 doc: |
   Run Delly on long-read data (PacBio and ONT). |

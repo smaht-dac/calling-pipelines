@@ -15,23 +15,20 @@ while getopts ":n:r:l:" opt; do
   esac
 done
 
-# **********************************************
-# 1. Create Delly long-read command line
-# **********************************************
-
-command="delly lr -g $reference_fasta"
-command+=" -o $sample_name-Delly-LR.bcf"
-command+=" $long_read_input"
+[[ -z "$output_file_prefix" || -z "$reference_fasta" || -z "$long_read_input" ]] && {
+  echo "Error: missing required arguments"
+  exit 1
+}
 
 # **********************************************
-# 2. Run Delly long-read command line
+# 1. Run Delly long-read command line
 # **********************************************
 
-eval $command || exit 1
+delly lr -g ${reference_fasta} -o ${output_file_prefix}.bcf ${long_read_input}
 
 # **********************************************
-# 3. Convert Delly long-read output to compressed vcf and index
+# 2. Convert Delly long-read output to compressed vcf and index
 # **********************************************
 
-bcftools view -Oz -o $output_file_prefix-Delly-LR.vcf.gz $output_file_prefix-Delly-LR.bcf
-tabix -p vcf $output_file_prefix-Delly-LR.vcf.gz
+bcftools view -Oz -o $output_file_prefix.vcf.gz $output_file_prefix.bcf
+tabix -p vcf $output_file_prefix.vcf.gz

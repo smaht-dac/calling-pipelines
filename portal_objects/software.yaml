@@ -129,7 +129,7 @@ code: SmahtSNV
 # Delly, v1.5.0
 ################################################################
 name: Delly
-version: 'd1.5.0'
+version: 'v1.5.0'
 source_url: https://github.com/dellytools/delly
 category:
   - Variant Calling

@@ -11,7 +11,7 @@ runner:
   main: delly_lr.cwl
 
 software:
-  - Delly@v.1.5.0
+  - Delly@v1.5.0
   - Bcftools@1.17
 
 category:
