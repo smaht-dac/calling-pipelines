@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 ## Command line arguments
 while getopts ":n:r:l:" opt; do
