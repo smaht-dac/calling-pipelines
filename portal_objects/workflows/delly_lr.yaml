@@ -33,7 +33,6 @@ input:
   output_file_prefix:
     argument_type: parameter.string
 
-
 ## Output information #######################################
 #     Output files and quality controls
 #############################################################
