@@ -15,7 +15,6 @@ runner:
 
 software:
   - Severus@v1.6
-  - Samtools@1.17
 
 category:
   - Variant Calling
@@ -34,7 +33,6 @@ input:
 
   # Optional inputs
   nthreads:
-    default: 16
     argument_type: parameter.integer
 
 ## Output information #######################################
