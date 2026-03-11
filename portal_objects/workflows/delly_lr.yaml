@@ -28,10 +28,6 @@ input:
 
   genome_reference_fasta:
     argument_type: file.fa
-  
-  # Required parameter arguments
-  output_file_prefix:
-    argument_type: parameter.string
 
 ## Output information #######################################
 #     Output files and quality controls
