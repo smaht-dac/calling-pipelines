@@ -365,6 +365,10 @@ accession: SMAFIC18XSH3
 
 ################################################################
 # Tandem repeat regions for Severus, GRCh38
+#   Shared and recommended in the Severus GitHub repo
+#   https://github.com/KolmogorovLab/Severus/tree/main/vntrs as
+#   human_GRCh38_no_alt_analysis_set.trf.bed
+#   Original source is from pbsv: https://github.com/PacificBiosciences/pbsv/tree/master/annotations
 ################################################################
 name: severus-tandem-repeat-regions
 description: Tandem repeat regions for Severus. |

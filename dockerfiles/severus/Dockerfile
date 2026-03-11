@@ -3,7 +3,7 @@
 #######################################################################
 FROM public.ecr.aws/smaht-dac/base-ubuntu2204-py310:0.0.1
 
-LABEL maintainers="Michele Berselli (berselli.michele@gmail.com)"
+LABEL maintainers="William Feng (william_feng@hms.harvard.edu), Michele Berselli (berselli.michele@gmail.com)"
 
 #######################################################################
 #     General updates & installing necessary Linux components

@@ -34,7 +34,7 @@ input:
 
   # Optional inputs
   nthreads:
-    # default: 16
+    default: 16
     argument_type: parameter.integer
 
 ## Output information #######################################
