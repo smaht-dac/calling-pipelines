@@ -22,7 +22,7 @@ input:
   tandem_repeats_bed:
     argument_type: file.bed
     files:
-      - 1ed7f234-9c15-4cb8-a877-c5eab5f4b441 # TODO: change this to alias
+      - severus-tandem-repeat-regions@GRCh38
 
   # Optional parameter inputs
   nthreads:
