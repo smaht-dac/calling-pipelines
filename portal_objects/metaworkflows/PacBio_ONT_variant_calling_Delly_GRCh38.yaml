@@ -25,10 +25,6 @@ input:
     files:
       - complete-reference-fasta-no-alt@GCA_000001405.15_GRCh38_no_decoy
 
-  # Parameter inputs
-  output_file_prefix:
-    argument_type: parameter.string
-
 ## Workflows and dependencies ###############################
 #     Information for the workflows and their dependencies
 #############################################################
