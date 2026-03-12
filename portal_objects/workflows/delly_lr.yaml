@@ -1,0 +1,40 @@
+## Workflow information #####################################
+#     General information for the workflow
+#############################################################
+name: delly_lr
+description: Run Delly on long-read data (PacBio and ONT). |
+             Produce structural variant calls in VCF format.  |
+             Accept a single long-read CRAM file as input
+
+runner:
+  language: cwl
+  main: delly_lr.cwl
+
+software:
+  - Delly@v1.5.0
+  - Bcftools@1.17
+
+category:
+  - Variant Calling
+
+## Input information ########################################
+#     Input files and parameters
+#############################################################
+input:
+
+  # Required file arguments
+  input_file_cram:
+    argument_type: file.cram
+
+  genome_reference_fasta:
+    argument_type: file.fa
+
+## Output information #######################################
+#     Output files and quality controls
+#############################################################
+output:
+
+  output_file_vcf_gz:
+    argument_type: file.vcf_gz
+    secondary_files:
+      - vcf_gz_tbi
