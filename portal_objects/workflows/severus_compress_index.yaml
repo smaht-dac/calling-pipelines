@@ -1,0 +1,45 @@
+## Workflow information #####################################
+#     General information for the workflow
+#############################################################
+name: severus_compress_index
+description: SV calling using Severus. |
+             Calls variants from long-read sequencing data in CRAM format. |
+             Accepts a CRAM file as input (required).
+
+runner:
+  language: cwl
+  main: severus_compress_index.cwl
+  child:
+    - severus.cwl
+    - compress_index_vcf.cwl
+
+software:
+  - Severus@v1.6
+
+category:
+  - Variant Calling
+
+## Input information ########################################
+#     Input files and parameters
+#############################################################
+input:
+
+  # File inputs
+  input_file_cram:
+    argument_type: file.cram
+
+  tandem_repeats_bed:
+    argument_type: file.bed
+
+  # Optional inputs
+  nthreads:
+    argument_type: parameter.integer
+
+## Output information #######################################
+#     Output files and quality controls
+#############################################################
+output:
+  output_file_vcf_gz:
+    argument_type: file.vcf_gz
+    secondary_files:
+      - vcf_gz_tbi
