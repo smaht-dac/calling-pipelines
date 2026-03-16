@@ -76,16 +76,13 @@ workflows:
     ## EC2 Configuration to use ########
     ####################################
     config:
-      instance_type: # TODO: Update instance types
-        - r5.8xlarge
-        - r5n.8xlarge
-        - r5a.8xlarge
-        - r6i.8xlarge
-        - r6a.8xlarge
-        - r7i.8xlarge
-        - r7a.8xlarge
-        - r8i.8xlarge
-        - r8a.8xlarge
+      instance_type:
+        - c5a.4xlarge
+        - c6a.4xlarge
+        - c6i.4xlarge
+        - c7a.4xlarge
+        - c7i.4xlarge
+        - c8a.4xlarge
       ebs_size: "1.5x"
       ebs_optimized: True
       spot_instance: True
