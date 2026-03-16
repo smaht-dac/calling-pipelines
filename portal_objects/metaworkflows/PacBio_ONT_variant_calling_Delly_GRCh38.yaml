@@ -69,7 +69,6 @@ workflows:
     config:
       instance_type:
         - r5a.large
-        - r5i.large
         - r6a.large
         - r6i.large
         - r7a.large
