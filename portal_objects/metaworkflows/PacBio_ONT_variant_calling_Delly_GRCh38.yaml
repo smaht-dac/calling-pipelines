@@ -68,18 +68,16 @@ workflows:
     ####################################
     config:
       instance_type:
-        - r5.4xlarge
-        - r5a.4xlarge
-        - r5b.4xlarge
-        - r5d.4xlarge
-        - r5n.4xlarge
-        - r6a.4xlarge
-        - r6g.4xlarge
-        - r6i.4xlarge
-        - r7a.4xlarge
-        - r7g.4xlarge
-      ebs_size: "2x"
+        - r5a.large
+        - r5i.large
+        - r6a.large
+        - r6i.large
+        - r7a.large
+        - r7i.large
+        - r8a.large
+        - r8i.large
+      ebs_size: "1.2x"
       ebs_optimized: True
-      spot_instance: True
+      spot_instance: False
       run_name: run_delly_lr
       behavior_on_capacity_limit: wait_and_retry
