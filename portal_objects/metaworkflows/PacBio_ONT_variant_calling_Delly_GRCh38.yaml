@@ -4,7 +4,7 @@
 name: PacBio_ONT_variant_calling_Delly_GRCh38
 description: Run Delly on long-read data (PacBio and ONT). |
              Produce structural variant calls in VCF format.  |
-             Accept a single long-read CRAM file as input
+             Accept a list of long-read input CRAM files with each file processed independently
 
 category:
   - Variant Calling
@@ -16,9 +16,9 @@ category:
 input:
 
   # File inputs
-  input_file_cram:
+  input_files_cram:
     argument_type: file.cram
-    dimensionality: 0
+    dimensionality: 1
 
   genome_reference_fasta:
     argument_type: file.fa
@@ -42,6 +42,8 @@ workflows:
       # File arguments
       input_file_cram:
         argument_type: file.cram
+        source_argument_name: input_files_cram
+        scatter: 1
 
       genome_reference_fasta:
         argument_type: file.fa
