@@ -52,4 +52,4 @@ steps:
       - output_file_vcf_gz
 
 doc: |
-    Long-read SNV and Indel calling using Severus, followed by compression and indexing of the resulting VCF file
+    Long-read (PacBio HiFi / ONT) SV calling using Severus, followed by compression and indexing of the resulting VCF file.
