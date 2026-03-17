@@ -2,8 +2,9 @@
 #     General information for the pipeline
 #############################################################
 name: PacBio_ONT_variant_calling_Severus_GRCh38
-description: Run Severus for germline and somatic variant calling using PacBio or ONT long read data. |
-             Accepts an input CRAM file and produces final calls in VCF format.
+description: Runs Severus for germline and somatic variant calling using PacBio or ONT long read data. |
+             Accepts a list of input CRAM files with each file processed independently and produces | 
+             a list of VCFs.
 
 category:
   - Variant Calling
@@ -15,9 +16,9 @@ category:
 input:
 
   # File inputs
-  input_file_cram:
+  input_files_cram:
     argument_type: file.cram
-    dimensionality: 0
+    dimensionality: 1
 
   tandem_repeats_bed:
     argument_type: file.bed
@@ -46,6 +47,8 @@ workflows:
       # File arguments
       input_file_cram:
         argument_type: file.cram
+        source_argument_name: input_files_cram
+        scatter: 1
 
       tandem_repeats_bed:
         argument_type: file.bed
