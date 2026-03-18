@@ -1,16 +1,18 @@
 ## Workflow information #####################################
 #     General information for the workflow
 #############################################################
-name: rufus
-description: Run RUFUS per shard. Each shard can run multiple regions using parallel jobs. |
-             Accept a single CRAM file as input
+name: delly_lr
+description: Run Delly on long-read data (PacBio and ONT). |
+             Produce structural variant calls in VCF format.  |
+             Accept a single long-read CRAM file as input
 
 runner:
   language: cwl
-  main: rufus.cwl
+  main: delly_lr.cwl
 
 software:
-  - RUFUS@d1.1.7
+  - Delly@v1.5.0
+  - Bcftools@1.17
 
 category:
   - Variant Calling
@@ -20,37 +22,12 @@ category:
 #############################################################
 input:
 
-  # File inputs
+  # Required file arguments
   input_file_cram:
     argument_type: file.cram
 
   genome_reference_fasta:
     argument_type: file.fa
-
-  genome_reference_bwt:
-    argument_type: file.bwt
-
-  region_file_tsv:
-    argument_type: file.tsv
-
-  shard_index:
-    argument_type: parameter.integer
-
-  # rufus_directory:
-  #   this is set as default in the CWL, tibanna can't handle this input type
-
-  # Parameter inputs
-  nthreads:
-    # default: 8
-    argument_type: parameter.integer
-
-  kg1_version:
-    # default: v3.0
-    argument_type: parameter.string
-
-  control_version:
-    # default: v1.0
-    argument_type: parameter.string
 
 ## Output information #######################################
 #     Output files and quality controls
