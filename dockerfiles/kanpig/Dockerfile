@@ -41,4 +41,8 @@ RUN conda install -y -c bioconda \
     bedtools \
     && conda clean -a -y -f
 
+# Import scripts
+COPY run_kanpig_plup.sh .
+RUN chmod +x run_kanpig_plup.sh
+
 CMD ["bash"]
