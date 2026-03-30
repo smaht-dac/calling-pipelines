@@ -148,3 +148,16 @@ category:
   - Variant Calling
 # Required for displaying in the file name
 code: delly
+
+---
+
+################################################################
+# kanpig, v1.1.0
+################################################################
+name: kanpig
+version: 'v1.1.0'
+source_url: https://github.com/ACEnglish/kanpig
+category:
+  - Variant Calling
+# Required for displaying in the file name
+code: kanpig
