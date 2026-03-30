@@ -21,7 +21,7 @@ OUTPUT_PREFIX="output"
 THREADS="$(nproc)"
 
 ## Command line arguments
-while getopts ":i:r:l:t:" opt; do
+while getopts ":i:r:o:t:h:" opt; do
   case $opt in
     i) LONG_READ_INPUT="$OPTARG" ;; # Input cram file
     r) REFERENCE_FASTA="$OPTARG" ;; # Reference file
@@ -45,4 +45,4 @@ done
 
 
 # Run kanpig plup
-/kanpig/target/release/kanpig plup --bam $LONG_READ_INPUT -r $reference --threads $thread | bedtools sort -header | bgzip > ${outputFile}.plup.gz
+kanpig plup --bam $LONG_READ_INPUT -r $REFERENCE_FASTA --threads $THREADS | bedtools sort -header | bgzip > ${OUTPUT_PREFIX}.plup.gz

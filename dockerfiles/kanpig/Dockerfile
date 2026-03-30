@@ -35,9 +35,8 @@ RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkg
 
 # Install
 RUN conda install -y -c bioconda \
-    kanpig==2.0.2 \
+    kanpig==1.1.0 \
     htslib \
-    bcftools \
     bedtools \
     && conda clean -a -y -f
 
