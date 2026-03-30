@@ -46,3 +46,4 @@ done
 
 # Run kanpig plup
 kanpig plup --bam $LONG_READ_INPUT -r $REFERENCE_FASTA --threads $THREADS | bedtools sort -header | bgzip > ${OUTPUT_PREFIX}.plup.gz
+tabix -p bed ${OUTPUT_PREFIX}.plup.gz

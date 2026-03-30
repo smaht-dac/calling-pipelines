@@ -44,6 +44,8 @@ inputs:
 outputs:
   - id: output_file_plup
     type: File
+    secondaryFiles:
+      - .tbi
     outputBinding:
       glob: $(inputs.output_prefix + ".plup.gz")
     doc: Plup file is output as output.plup.gz
