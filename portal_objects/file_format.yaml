@@ -18,7 +18,7 @@ uuid: 8bf61e98-810e-4160-94ff-034c950ae959
 #   kanpig: https://github.com/ACEnglish/kanpig.
 ################################################################
 name: plup_gz
-extension: plup_gz
+extension: plup.gz
 description: Compressed version of plup file format used to |
              represent genomic pileups.
 secondary_formats:

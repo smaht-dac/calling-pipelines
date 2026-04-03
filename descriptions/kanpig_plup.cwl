@@ -6,7 +6,7 @@ class: CommandLineTool
 requirements:
   - class: InlineJavascriptRequirement
   - class: DockerRequirement
-    dockerPull: ACCOUNT/severus:VERSION
+    dockerPull: ACCOUNT/kanpig:VERSION
 
 baseCommand: [run_kanpig_plup.sh]
 
@@ -42,7 +42,7 @@ inputs:
     doc: Number of threads to use [8]
 
 outputs:
-  - id: output_file_plup
+  - id: output_file_plup_gz
     type: File
     secondaryFiles:
       - .tbi
