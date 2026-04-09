@@ -77,15 +77,17 @@ workflows:
 
     ## EC2 Configuration to use ########
     ####################################
-    config: # TODO: Update instance type and spot instance once done testing
-      instance_type:
-        - m5a.8xlarge
-        - m6a.8xlarge
-        - m6i.8xlarge
-        - m7i.8xlarge
-        - m8i.8xlarge
-      ebs_size: "1.5x"
+    config:
+      instance_type: # 8 cores, 16 GiB
+        - c5a.2xlarge
+        - c6a.2xlarge
+        - c6i.2xlarge
+        - c7a.2xlarge
+        - c7i.2xlarge
+        - c8a.2xlarge
+        - c8i.2xlarge
+      ebs_size: "1.4x"
       ebs_optimized: True
-      spot_instance: False 
+      spot_instance: True 
       run_name: run_kanpig_plup
       behavior_on_capacity_limit: wait_and_retry
