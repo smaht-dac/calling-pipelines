@@ -14,6 +14,14 @@ EOF
   exit 1
 }
 
+# Sort file deterministically without bedtools
+sort_file() {
+    awk '
+        /^#/ { print; next } 
+        { print | "sort -k1,1V -k2,2n -k3,3n" }
+    '
+}
+
 # Defaults
 LONG_READ_INPUT=""
 REFERENCE_FASTA=""
@@ -45,5 +53,5 @@ done
 
 
 # Run kanpig plup
-kanpig plup --bam $LONG_READ_INPUT -r $REFERENCE_FASTA --threads $THREADS | bedtools sort -header | bgzip > ${OUTPUT_PREFIX}.plup.gz
+kanpig plup --bam $LONG_READ_INPUT -r $REFERENCE_FASTA --threads $THREADS | sort_file | bgzip > ${OUTPUT_PREFIX}.plup.gz
 tabix -p bed ${OUTPUT_PREFIX}.plup.gz

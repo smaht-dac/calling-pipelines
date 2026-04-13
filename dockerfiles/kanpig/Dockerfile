@@ -37,7 +37,6 @@ RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkg
 RUN conda install -y -c bioconda \
     kanpig==1.1.0 \
     htslib==1.3.1 \
-    bedtools==2.31.1 \
     && conda clean -a -y -f
 
 # Import scripts
