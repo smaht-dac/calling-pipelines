@@ -2,7 +2,7 @@
 #     General information for the workflow
 #############################################################
 name: kanpig_plup
-description: Structural variant pileups with kanpig. |
+description: Pileups with kanpig. |
              Creates a pileup file from long-read sequencing data (PacBio HiFi / ONT) |
              in CRAM format to support structural variant calling.
 

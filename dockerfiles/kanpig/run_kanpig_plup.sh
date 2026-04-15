@@ -8,7 +8,7 @@ Usage: $0 -i input.cram -r reference.fa [-o prefix] [-t threads] [-h]
   -i   Long read normal BAM/CRAM with index (.bai/.crai) (required)
   -r   Reference FASTA with index (.fai) (required)
   -o   Output file prefix (default: output) -> <prefix>.plup.gz
-  -t   Threads (default: number of cores)
+  -t   Threads (default: number of cores on machine)
   -h   Help
 EOF
   exit 1

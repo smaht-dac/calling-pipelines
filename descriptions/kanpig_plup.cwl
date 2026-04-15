@@ -51,4 +51,4 @@ outputs:
     doc: Plup file is output as output.plup.gz
 
 doc: |
-  Kanpig structural variant pileups on long-read sequencing data (PacBio HiFi / ONT).
+  Kanpig pileups on long-read sequencing data (PacBio HiFi / ONT).
