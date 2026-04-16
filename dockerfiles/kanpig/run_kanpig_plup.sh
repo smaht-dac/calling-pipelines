@@ -53,5 +53,5 @@ done
 
 
 # Run kanpig plup
-kanpig plup --bam $LONG_READ_INPUT -r $REFERENCE_FASTA --threads $THREADS | sort_file | bgzip > ${OUTPUT_PREFIX}.plup.gz
-tabix -p bed ${OUTPUT_PREFIX}.plup.gz
+kanpig plup --bam $LONG_READ_INPUT -r $REFERENCE_FASTA --threads $THREADS | sort_file | bgzip > ${OUTPUT_PREFIX}.plup.gz || { echo "Error: kanpig plup failed"; exit 1; }
+tabix -p bed ${OUTPUT_PREFIX}.plup.gz || { echo "Error: tabix failed"; exit 1; }
