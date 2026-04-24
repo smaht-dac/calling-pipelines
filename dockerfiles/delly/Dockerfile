@@ -3,7 +3,7 @@
 #######################################################################
 FROM public.ecr.aws/smaht-dac/base-ubuntu2204-py38:0.0.1
 
-LABEL maintainers="Charlotte Zhang (charlotte_zhang@hms.harvard.edu), Michele Berselli (berselli.michele@gmail.com)"
+LABEL maintainers="Charlotte Zhang (charlotte_zhang@hms.harvard.edu), William Feng (william_feng@hms.harvard.edu), Michele Berselli (berselli.michele@gmail.com)"
 
 #######################################################################
 #     General updates & installing necessary Linux components
@@ -45,9 +45,9 @@ WORKDIR /usr/local/bin/
 RUN ln -s bcftools-1.17 bcftools
 
 ## Delly install
-RUN wget https://github.com/dellytools/delly/releases/download/v1.5.0/delly_v1.5.0_linux_x86_64bit \
-    && chmod +x delly_v1.5.0_linux_x86_64bit \
-    && ln -s delly_v1.5.0_linux_x86_64bit delly
+RUN wget https://github.com/dellytools/delly/releases/download/v1.7.3/delly-v1.7.3-linux-amd64 \
+    && chmod +x delly-v1.7.3-linux-amd64 \
+    && ln -s delly-v1.7.3-linux-amd64 delly
 
 #######################################################################
 #     Scripts
@@ -55,6 +55,10 @@ RUN wget https://github.com/dellytools/delly/releases/download/v1.5.0/delly_v1.5
 ## run_Delly_lr
 COPY run_delly_lr.sh .
 RUN chmod +x run_delly_lr.sh
+
+## run_Delly_sr
+COPY run_delly_sr.sh .
+RUN chmod +x run_delly_sr.sh
 
 #######################################################################
 #     Updating env
