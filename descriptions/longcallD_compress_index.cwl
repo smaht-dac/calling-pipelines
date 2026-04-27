@@ -60,6 +60,14 @@ outputs:
     outputSource: compress_index_vcf/output_file_vcf_gz
 
 steps:
+  calling_utils_docker_pull:
+    # Pre-pulling the Docker image used by the compress_index_vcf step to avoid 
+    # pulling it during the workflow execution and to prevent credentials from 
+    # expiring during the execution.
+    run: calling_utils_docker_pull.cwl
+    in: []
+    out: [output_log_txt]
+
   longcallD:
     run: longcallD.cwl
     in:
@@ -77,6 +85,10 @@ steps:
         source: platform
       nthreads:
         source: nthreads
+      dummy_dependency:
+        # Dummy dependency to ensure the calling_utils Docker image is
+        # pre-pulled before this step is run
+        source: calling_utils_docker_pull/output_log_txt
     out:
       - output_file_vcf
 
