@@ -1,0 +1,140 @@
+## Pipeline information #####################################
+#     General information for the pipeline
+#############################################################
+name: paired-end_short_reads_variant_calling_Delly_GRCh38
+description: Run Delly on short-read data for structural variant calling. |
+             Accepts a list of CRAM files as input, merges them, and produces |
+             final calls in VCF format. |
+
+category:
+  - Variant Calling
+
+## General arguments ########################################
+#     Pipeline input, reference files, and general arguments
+#       define all arguments for the pipeline here
+#############################################################
+input:
+
+  # File inputs
+  input_files_cram:
+    argument_type: file.cram
+    dimensionality: 1
+
+  genome_reference_fasta:
+    argument_type: file.fa
+    files:
+      - complete-reference-fasta-no-alt_GCA_000001405.15_GRCh38_no_decoy
+
+  exclude_tsv:
+    argument_type: file.tsv
+    files:
+      - delly-sr-exclusion-regions@GRCh38
+
+## Workflows and dependencies ###############################
+#     Information for the workflows and their dependencies
+#############################################################
+workflows:
+
+  ## Workflow definition #####################
+  #  samtools_merge_cram
+  ############################################
+  samtools_merge_cram:
+
+    ## Specific arguments ##############
+    ####################################
+    input:
+
+      # File arguments
+      input_files_cram:
+        argument_type: file.cram
+        mount: True
+
+      genome_reference_fasta:
+        argument_type: file.fa
+
+      # Parameter arguments
+      nthreads:
+        argument_type: parameter.integer
+        value: 4
+
+    ## Output ##############################
+    #     Output files for the workflow
+    ########################################
+    output:
+
+      # File output
+      output_file_cram:
+        description: Sample CRAM (merged)
+        data_category:
+          - Sequencing Reads
+        data_type:
+          - Aligned Reads
+        s3_lifecycle_category: no_storage
+
+    ## EC2 Configuration to use ########
+    ####################################
+    config:
+      instance_type:
+        - c5.xlarge
+        - c5a.xlarge
+        - m5.xlarge
+        - m5a.xlarge
+        - m6i.xlarge
+        - m6a.xlarge
+        - m7i.xlarge
+        - m7a.xlarge
+      ebs_size: "2.5x"
+      ebs_optimized: True
+      spot_instance: False
+      run_name: run_samtools_merge_cram
+      behavior_on_capacity_limit: wait_and_retry
+
+  ## Workflow definition #####################
+  #  rufus
+  ############################################
+  delly_sr:
+
+    ## Specific arguments ##############
+    ####################################
+    input:
+
+      # File arguments
+      input_file_cram:
+        argument_type: file.cram
+        source: samtools_merge_cram
+        source_argument_name: output_file_cram
+
+      genome_reference_fasta:
+        argument_type: file.fa
+
+      exclude_tsv:
+        argument_type: file.tsv
+
+    ## Output ##############################
+    #     Output files for the workflow
+    ########################################
+    output:
+
+      # File output
+      output_file_vcf_gz:
+        description: Delly-SR output VCF
+        data_category: # TODO: Double-check this
+          - Germline Variant Calls
+          - Somatic Variant Calls
+        data_type:
+          - SV
+
+    ## EC2 Configuration to use ########
+    ####################################
+    config: # TODO: Optimize after test runs
+      instance_type: 
+        - r5a.2xlarge
+        - r6i.2xlarge
+        - r6a.2xlarge
+        - r7i.2xlarge
+        - r8i.2xlarge
+      ebs_size: "2.5x"
+      ebs_optimized: True
+      spot_instance: False
+      run_name: run_delly_sr
+      behavior_on_capacity_limit: wait_and_retry
