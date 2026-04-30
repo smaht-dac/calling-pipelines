@@ -382,26 +382,3 @@ type:
 # Required to enable sync with a reference bucket
 uuid: 1ed7f234-9c15-4cb8-a877-c5eab5f4b441
 accession: SMAFI5ABC123
-
----
-
-################################################################
-# Exclusion regions for Delly, GRCh38
-#   Provided and recommended in the Delly GitHub repo
-#   https://github.com/dellytools/delly/tree/main/excludeTemplates as
-#   human.hg38.excl.tsv
-#   Includes telomeres, centromeres, and unplaced contigs
-################################################################
-name: delly-sr-exclusion-regions
-description: Exclusion regions for Delly. |
-             Includes telomeres, centromeres, and unplaced contigs. |
-             Build hg38/GRCh38
-format: tsv
-version: 'GRCh38'
-category:
-  - Genome Region
-type:
-  - Sequence Interval
-# Required to enable sync with a reference bucket
-uuid: ac627278-230a-437b-8e7b-f30963d1fe1d
-accession: SMAFID29YTI4
