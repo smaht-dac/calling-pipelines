@@ -52,4 +52,4 @@ outputs:
 
 doc: |
   Run Delly on short-read data (Illumina). |
-  Produce structural variant calls in VCF format. 
+  Produce structural variant calls in VCF format.

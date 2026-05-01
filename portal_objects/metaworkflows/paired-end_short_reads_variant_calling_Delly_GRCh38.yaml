@@ -23,7 +23,7 @@ input:
   genome_reference_fasta:
     argument_type: file.fa
     files:
-      - complete-reference-fasta-no-alt_GCA_000001405.15_GRCh38_no_decoy
+      - complete-reference-fasta-no-alt@GCA_000001405.15_GRCh38_no_decoy
 
   exclude_tsv:
     argument_type: file.tsv
@@ -90,7 +90,7 @@ workflows:
       behavior_on_capacity_limit: wait_and_retry
 
   ## Workflow definition #####################
-  #  rufus
+  #  delly_sr
   ############################################
   delly_sr:
 
@@ -118,11 +118,16 @@ workflows:
       # File output
       output_file_vcf_gz:
         description: Delly-SR output VCF
-        data_category: # TODO: Double-check this
+        data_category:
           - Germline Variant Calls
           - Somatic Variant Calls
         data_type:
           - SV
+        output_status: Final Output
+        # These fields are required to link metadata for the naming
+        software:
+          - smaht:Software-Delly_v1.7.3
+        reference_genome: GRCh38
 
     ## EC2 Configuration to use ########
     ####################################
