@@ -10,6 +10,7 @@ runner:
   language: cwl
   main: longcallD_compress_index.cwl
   child:
+    - calling_utils_docker_pull.cwl
     - longcallD.cwl
     - compress_index_vcf.cwl
 
