@@ -77,13 +77,11 @@ workflows:
       instance_type:
         - c5.xlarge
         - c5a.xlarge
-        - m5.xlarge
+        - c6a.xlarge
+        - c6i.xlarge
         - m5a.xlarge
-        - m6i.xlarge
         - m6a.xlarge
-        - m7i.xlarge
-        - m7a.xlarge
-      ebs_size: "2.5x"
+      ebs_size: "1.75x"
       ebs_optimized: True
       spot_instance: False
       run_name: run_samtools_merge_cram
@@ -131,14 +129,14 @@ workflows:
 
     ## EC2 Configuration to use ########
     ####################################
-    config: # TODO: Optimize after test runs
-      instance_type: 
-        - r5a.2xlarge
-        - r6i.2xlarge
-        - r6a.2xlarge
-        - r7i.2xlarge
-        - r8i.2xlarge
-      ebs_size: "2.5x"
+    config:
+      instance_type: # 16 GiB, 2 cores
+        - r5a.large
+        - r6a.large
+        - r6i.large
+        - r7i.large
+        - r8i.large
+      ebs_size: "1.5x"
       ebs_optimized: True
       spot_instance: False
       run_name: run_delly_sr
