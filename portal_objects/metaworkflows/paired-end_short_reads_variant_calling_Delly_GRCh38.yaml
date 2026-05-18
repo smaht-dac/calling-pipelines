@@ -130,12 +130,12 @@ workflows:
     ## EC2 Configuration to use ########
     ####################################
     config:
-      instance_type: # 16 GiB, 2 cores
-        - r5a.large
-        - r6a.large
-        - r6i.large
-        - r7i.large
-        - r8i.large
+      instance_type: # 32 GiB, 4 cores
+        - r5a.xlarge
+        - r6a.xlarge
+        - r6i.xlarge
+        - r7i.xlarge
+        - r8i.xlarge
       ebs_size: "1.5x"
       ebs_optimized: True
       spot_instance: False
