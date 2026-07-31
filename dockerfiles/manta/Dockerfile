@@ -41,16 +41,6 @@ RUN conda create -y -n manta -c bioconda \
 
 ENV PATH=/opt/conda/envs/manta/bin:$PATH
 
-## Samtools install
-#- Used to merge multiple input CRAMs before calling Manta. Installed into a
-#- dedicated env to keep the py2.7 manta env pristine. Version matches the
-#- Samtools@1.17 entry in shared-pipelines/portal_objects/software.yaml
-RUN conda create -y -n samtools -c bioconda \
-    samtools==1.17 \
-    && conda clean -a -y -f
-
-ENV PATH=/opt/conda/envs/samtools/bin:$PATH
-
 #######################################################################
 #     Scripts
 #######################################################################

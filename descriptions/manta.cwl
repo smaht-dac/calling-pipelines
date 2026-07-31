@@ -13,18 +13,14 @@ hints:
 baseCommand: [run_manta.sh]
 
 inputs:
-  - id: input_files_cram
-    type:
-      type: array
-      items: File
-      inputBinding:
-        prefix: -t
-    secondaryFiles:
-      - .crai
+  - id: input_file_cram
+    type: File
     inputBinding:
       position: 1
-    doc: One or more tumor CRAM files with index (.crai). |
-         Merged internally if more than one is provided
+      prefix: -t
+    secondaryFiles:
+      - .crai
+    doc: Input CRAM file with index (.crai). Tumor sample
 
   - id: genome_reference_fasta
     type: File
@@ -71,5 +67,4 @@ outputs:
 
 doc: |
   Wrapper for run_manta.sh to run Manta in tumor-only mode for whole-genome |
-  structural variant calling. Accepts one or more tumor CRAM files as input; |
-  multiple CRAMs are merged internally with samtools before calling Manta
+  structural variant calling. Use a CRAM file as input

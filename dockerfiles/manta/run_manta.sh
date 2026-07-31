@@ -5,28 +5,25 @@ IFS=$'\n\t'
 ###############################################################################
 # Run Manta in tumor-only mode (whole genome)
 #
-# - Accepts one or more tumor CRAM files with index (.crai)
-# - When more than one CRAM is given, they are merged internally with
-#   "samtools merge" before calling Manta; a single CRAM is passed directly
-# - Requires: Manta (configManta.py), Samtools (samtools)
+# - Accepts a single tumor CRAM file with index
+# - Requires: Manta (configManta.py)
 ###############################################################################
 
 usage() {
   cat <<EOF
-Usage: $0 -t tumor.cram [-t tumor2.cram ...] -r reference.fa [-o prefix] [-j threads] [-h]
+Usage: $0 -t tumor.cram -r reference.fa [-o prefix] [-j threads] [-h]
 
-  -t   Tumor CRAM with index (.crai) (required, repeatable). If more than one is
-       given, they are merged internally before calling Manta
+  -t   Tumor CRAM with index (.crai) (required)
   -r   Reference FASTA with index (.fai) (required)
   -o   Output prefix (default: output) -> <prefix>.tumorSV.vcf.gz / <prefix>.candidateSV.vcf.gz
-  -j   Threads/parallel jobs for runWorkflow.py and samtools merge (default: number of cores)
+  -j   Threads/parallel jobs for runWorkflow.py (default: number of cores)
   -h   Help
 EOF
   exit 1
 }
 
 # Defaults
-TUMOR_CRAMS=()
+TUMOR_CRAM=""
 REFERENCE_FASTA=""
 OUT_PREFIX="output"
 JOBS="$(nproc)"
@@ -34,7 +31,7 @@ JOBS="$(nproc)"
 # Parse args
 while getopts "t:r:o:j:h" opt; do
   case "$opt" in
-    t) TUMOR_CRAMS+=("$OPTARG") ;;
+    t) TUMOR_CRAM="$OPTARG" ;;
     r) REFERENCE_FASTA="$OPTARG" ;;
     o) OUT_PREFIX="$OPTARG" ;;
     j) JOBS="$OPTARG" ;;
@@ -44,17 +41,14 @@ while getopts "t:r:o:j:h" opt; do
 done
 
 # Required checks
-[[ "${#TUMOR_CRAMS[@]}" -ge 1 && -n "$REFERENCE_FASTA" ]] || usage
+[[ -n "$TUMOR_CRAM" && -n "$REFERENCE_FASTA" ]] || usage
 
 # Tool checks
 command -v configManta.py >/dev/null 2>&1 || { echo "ERROR: configManta.py not found in PATH"; exit 1; }
-command -v samtools >/dev/null 2>&1 || { echo "ERROR: samtools not found in PATH"; exit 1; }
 
 # File checks
-for cram in "${TUMOR_CRAMS[@]}"; do
-  [[ -f "$cram" ]] || { echo "Error: $cram not found"; exit 1; }
-  [[ -f "${cram}.crai" ]] || { echo "Error: ${cram}.crai not found"; exit 1; }
-done
+[[ -f "$TUMOR_CRAM" ]] || { echo "Error: $TUMOR_CRAM not found"; exit 1; }
+[[ -f "${TUMOR_CRAM}.crai" ]] || { echo "Error: ${TUMOR_CRAM}.crai not found"; exit 1; }
 
 [[ -f "$REFERENCE_FASTA" ]] || { echo "Error: $REFERENCE_FASTA not found"; exit 1; }
 [[ -f "${REFERENCE_FASTA}.fai" ]] || { echo "Error: ${REFERENCE_FASTA}.fai not found"; exit 1; }
@@ -68,25 +62,11 @@ trap cleanup EXIT
 MANTA_DIR="${RUN_DIR}/tmp.manta"
 
 # **********************************************
-# 0. Merge input CRAMs (only when more than one)
-# **********************************************
-if [[ "${#TUMOR_CRAMS[@]}" -gt 1 ]]; then
-  echo "==> Merging ${#TUMOR_CRAMS[@]} input CRAMs"
-  TUMOR_INPUT="${RUN_DIR}/merged.cram"
-  samtools merge -f --write-index -@ "$JOBS" \
-    --reference "$REFERENCE_FASTA" \
-    "$TUMOR_INPUT" "${TUMOR_CRAMS[@]}" || { echo "Error: samtools merge failed"; exit 1; }
-else
-  echo "==> Single input CRAM, skipping merge"
-  TUMOR_INPUT="${TUMOR_CRAMS[0]}"
-fi
-
-# **********************************************
 # 1. Configure Manta tumor-only workflow
 # **********************************************
 echo "==> Configuring Manta tumor-only workflow"
 configManta.py \
-  --tumorBam "$TUMOR_INPUT" \
+  --tumorBam "$TUMOR_CRAM" \
   --referenceFasta "$REFERENCE_FASTA" \
   --runDir "$MANTA_DIR" || { echo "Error: configManta.py failed"; exit 1; }
 
