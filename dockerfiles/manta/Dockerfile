@@ -35,11 +35,13 @@ RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkg
 RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
 
 # Install
-RUN conda create -y -n manta -c bioconda \
+#- Conda lives at /miniconda3 in the base image, so the env is /miniconda3/envs/manta
+RUN conda create -y -p /miniconda3/envs/manta -c bioconda \
     manta==1.6.0 \
-    && conda clean -a -y -f
+    && conda clean -a -y -f \
+    && test -x /miniconda3/envs/manta/bin/configManta.py
 
-ENV PATH=/opt/conda/envs/manta/bin:$PATH
+ENV PATH=/miniconda3/envs/manta/bin:$PATH
 
 #######################################################################
 #     Scripts
