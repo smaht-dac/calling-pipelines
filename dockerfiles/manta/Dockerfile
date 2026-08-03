@@ -36,12 +36,27 @@ RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkg
 
 # Install
 #- Conda lives at /miniconda3 in the base image, so the env is /miniconda3/envs/manta
-RUN conda create -y -p /miniconda3/envs/manta -c bioconda \
+#- libboost must be pinned to 1.85: the bioconda manta package declares an
+#- unpinned `libboost` dependency, but its libexec binaries are linked against
+#- libboost_{filesystem,program_options,serialization}.so.1.85.0. Without the
+#- pin the solver installs a newer libboost and every libexec binary fails at
+#- runtime with "error while loading shared libraries"
+RUN conda create -y -p /miniconda3/envs/manta -c bioconda -c conda-forge \
     manta==1.6.0 \
+    libboost==1.85.0 \
     && conda clean -a -y -f \
     && test -x /miniconda3/envs/manta/bin/configManta.py
 
 ENV PATH=/miniconda3/envs/manta/bin:$PATH
+
+## Verify that all Manta binaries have their shared libraries resolved,
+## so a dependency mismatch fails the build instead of the pipeline run
+RUN set -eu; \
+    for f in /miniconda3/envs/manta/libexec/*; do \
+      if ldd "$f" 2>/dev/null | grep -q "not found"; then \
+        echo "ERROR: unresolved shared libraries in $f"; ldd "$f"; exit 1; \
+      fi; \
+    done
 
 #######################################################################
 #     Scripts
