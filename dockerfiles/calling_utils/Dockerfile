@@ -3,18 +3,20 @@
 #######################################################################
 FROM public.ecr.aws/smaht-dac/base-ubuntu2204-py39:0.0.1
 
-LABEL maintainers="Michele Berselli (berselli.michele@gmail.com)"
+LABEL maintainers="Michele Berselli (berselli.michele@gmail.com), Charlotte Zhang (charlotte_zhang@hms.harvard.edu)"
 
 #######################################################################
 #     General updates & installing necessary Linux components
 #       - libncurses-dev, libbz2-dev, liblzma-dev used by samtools
+#       - libhts-dev used by minipileup2
 #######################################################################
 RUN apt-get update -y && apt-get install -y \
     locales \
     tabix=1.13+ds-2build1 \
-    libncurses-dev=6.3-2ubuntu0.1 \
+    libncurses-dev=6.3-2ubuntu0.2 \
     libbz2-dev=1.0.8-5build1 \
-    liblzma-dev=5.2.5-2ubuntu1 \
+    liblzma-dev=5.2.5-2ubuntu1.1 \
+    libhts-dev=1.13+ds-2build1 \
     --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -74,6 +76,17 @@ RUN make
 
 WORKDIR /usr/local/bin/
 RUN ln -s minipileup-1.4b minipileup
+
+## minipileup2 (used by v2)
+RUN git clone https://github.com/corinsexton/minipileup.git minipileup2-src && \
+    cd minipileup2-src && \
+    git checkout 8a72f5aeaa6ee61c77461dadd087b37f2db8622b
+
+WORKDIR /usr/local/bin/minipileup2-src
+RUN make
+
+WORKDIR /usr/local/bin/
+RUN ln -s minipileup2-src/minipileup2 minipileup2
 
 ## Bedtools install
 RUN wget https://github.com/arq5x/bedtools2/releases/download/v2.31.1/bedtools-2.31.1.tar.gz && \
