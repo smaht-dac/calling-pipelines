@@ -20,7 +20,7 @@ inputs:
       prefix: -t
     secondaryFiles:
       - .crai
-    doc: Input CRAM file with index (.crai). Tumor sample
+    doc: Input CRAM file with index (.crai). Treated as tumor sample in Manta.
 
   - id: genome_reference_fasta
     type: File
