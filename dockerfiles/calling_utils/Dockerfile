@@ -151,6 +151,10 @@ RUN chmod +x filter_by_poe.py
 COPY scripts/filter_clustered_variants.py .
 RUN chmod +x filter_clustered_variants.py
 
+# filter_clustered_variants_v2.py
+COPY scripts/filter_clustered_variants_v2.py .
+RUN chmod +x filter_clustered_variants_v2.py
+
 # tier_filter_variants_SR_PB_ONT.py
 COPY scripts/tier_filter_variants_SR_PB_ONT.py .
 RUN chmod +x tier_filter_variants_SR_PB_ONT.py
@@ -166,6 +170,10 @@ RUN chmod +x phasing_step2_phase_mosaic.py
 # merge_callers.py
 COPY scripts/merge_callers.py .
 RUN chmod +x merge_callers.py
+
+# merge_callers_v2.py
+COPY scripts/merge_callers_v2.py .
+RUN chmod +x merge_callers_v2.py
 
 # parse_minipileup_sr_only.py
 COPY scripts/parse_minipileup_sr_only.py .
