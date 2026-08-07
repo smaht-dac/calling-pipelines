@@ -190,6 +190,7 @@ ENV PATH=/usr/local/bin/:$PATH
 ENV PATH=/usr/local/bin/samtools/:$PATH
 ENV PATH=/usr/local/bin/bcftools/:$PATH
 ENV PATH=/usr/local/bin/minipileup/:$PATH
+ENV PATH=/usr/local/bin/minipileup2/:$PATH
 ENV PATH=/usr/local/bin/bedtools/bin/:$PATH
 
 CMD ["bash"]
