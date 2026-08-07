@@ -164,9 +164,11 @@ def validate_input_vcf(value):
 
 def validate_core_id(value):
     """
-    Validate a --vcf_core_id value.
+    Validate a --vcf_core_id value of the form CALLER:CORE_ID.
 
-    Two classes of character are rejected.
+    First, split on : to separate CALLER and CORE_ID. Then validate CALLER and CORE_ID separately.
+
+    Two classes of character are rejected in CORE_ID validation:
 
     CORE_CALLS delimiters — the field uses '|' to separate cores, ':' to
     separate a core from its caller list, and ',' to separate callers within
@@ -181,26 +183,51 @@ def validate_core_id(value):
     Note that '-' is deliberately allowed: downstream, a hyphen marks a merged
     core (e.g. '001B2-001C5') and is split on to recover the constituents.
     """
-    if not value:
+    if ":" not in value:
+        raise argparse.ArgumentTypeError(
+            f"Invalid format '{value}'. Expected CALLER:CORE_ID"
+        )
+
+    caller, core_id = value.split(":", 1)
+    
+    # Enforce allowed CALLER names
+    if caller not in VALID_CALLERS:
+        allowed = ", ".join(VALID_CALLERS)
+        raise argparse.ArgumentTypeError(
+            f"Caller '{caller}' does not match allowed callers: {allowed}"
+        )
+
+    # Enforce non-empty core ID and disallow rejected characters
+    if not core_id:
         raise argparse.ArgumentTypeError("Core ID must not be empty")
     for bad_char in (":", "|", ","):
-        if bad_char in value:
+        if bad_char in core_id:
             raise argparse.ArgumentTypeError(
-                f"Invalid core ID '{value}': must not contain '{bad_char}' "
+                f"Invalid core ID '{core_id}': must not contain '{bad_char}' "
                 "(reserved as a CORE_CALLS delimiter)"
             )
     for bad_char in (";", "="):
-        if bad_char in value:
+        if bad_char in core_id:
             raise argparse.ArgumentTypeError(
-                f"Invalid core ID '{value}': must not contain '{bad_char}' "
+                f"Invalid core ID '{core_id}': must not contain '{bad_char}' "
                 "(reserved by the VCF INFO column)"
             )
-    if any(c.isspace() for c in value):
+    if any(c.isspace() for c in core_id):
         raise argparse.ArgumentTypeError(
-            f"Invalid core ID '{value}': must not contain whitespace "
+            f"Invalid core ID '{core_id}': must not contain whitespace "
             "(whitespace terminates the VCF INFO column)"
         )
     return value
+
+def count_by_caller(caller_prefixed_values):
+    """
+    Count the number of entries per caller in a list of CALLER:VALUE strings (eg. VCF paths or core IDs).
+    """
+    counts = {}
+    for value in caller_prefixed_values:
+        caller, _rest = value.split(":", 1)
+        counts[caller] = counts.get(caller, 0) + 1
+    return counts
 
 def normalize_core_id(core):
     """
@@ -331,25 +358,34 @@ def bgzip_and_tabix(path):
 ################################################################################
 def main(args):
 
-    # Validate input VCF and create handlers.
-    # Cores, when given, are matched to -i by position: the Nth -c applies to
+    # Validate input VCF, normalize core IDs, and create handlers.
+    # Cores are matched to -i by position: the Nth -c applies to
     # the Nth -i. Splitting on the first colon only keeps VCF paths that
     # contain colons (e.g. 's3://bucket/key.vcf.gz') intact.
-    caller_handlers = []   # list of (core, handler)
-    for idx, caller_vcf in enumerate(args.input_vcf):
+    vcfs_by_caller = {}    # caller -> list of vcf_path, in order of appearance
+    for caller_vcf in args.input_vcf:
         caller, vcf_path = caller_vcf.split(":", 1)
-        core = normalize_core_id(args.vcf_core_id[idx])
+        vcfs_by_caller.setdefault(caller, []).append(vcf_path)
 
-        if caller == "TNhaplotyper2":
-            handler = TNhaplotyper2Vcf(vcf_path)
-        elif caller == "Strelka2":
-            handler = Strelka2Vcf(vcf_path)
-        elif caller == "longcallD":
-            handler = longcallDVcf(vcf_path)
-        elif caller == "RUFUS":
-            handler = RUFUSVcf(vcf_path)
+    cores_by_caller = {}   # caller -> list of normalized core, in order of appearance
+    for caller_core in args.vcf_core_id:
+        caller, core = caller_core.split(":", 1)
+        cores_by_caller.setdefault(caller, []).append(normalize_core_id(core))
 
-        caller_handlers.append((core, handler))
+    caller_handlers = []   # list of (core, handler)
+    for caller, vcf_paths in vcfs_by_caller.items():
+        cores = cores_by_caller.get(caller, [])
+        for vcf_path, core in zip(vcf_paths, cores):
+            if caller == "TNhaplotyper2":
+                handler = TNhaplotyper2Vcf(vcf_path)
+            elif caller == "Strelka2":
+                handler = Strelka2Vcf(vcf_path)
+            elif caller == "longcallD":
+                handler = longcallDVcf(vcf_path)
+            elif caller == "RUFUS":
+                handler = RUFUSVcf(vcf_path)
+
+            caller_handlers.append((core, handler))
 
     # Merge VCF records
     merged_records = {}
@@ -497,7 +533,7 @@ if __name__ == "__main__":
         "-c", "--vcf_core_id",
         action="append",
         required=True,
-        metavar="CORE",
+        metavar="CALLER:CORE",
         type=validate_core_id,
         help=(
         "Sequencing core ID for the -i VCF at the SAME POSITION on the\n"
@@ -523,9 +559,9 @@ if __name__ == "__main__":
         "meaningful and must not be used in an ordinary core name.\n"
         "\n"
         "Example (two callers on core 001B2, one on merged core 001B2-001C5):\n"
-        "    -i RUFUS:a.vcf.gz         -c 001B2 \\\n"
-        "    -i Strelka2:b.vcf.gz      -c 001B2 \\\n"
-        "    -i TNhaplotyper2:c.vcf.gz -c 001B2-001C5\n"
+        "    -i RUFUS:a.vcf.gz         -c RUFUS:001B2 \\\n"
+        "    -i Strelka2:b.vcf.gz      -c Strelka2:001B2 \\\n"
+        "    -i TNhaplotyper2:c.vcf.gz -c TNhaplotyper2:001B2-001C5\n"
         "\n"
         "Ordering note: -i and -c are collected into two independent lists in\n"
         "command-line order, so they need not be interleaved. They only need\n"
@@ -549,14 +585,26 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # -c is matched to -i by position, so the two lists must be the same length.
-    # argparse already guarantees at least one of each via required=True; this
-    # catches the mismatched-count case with a message that names both counts.
-    if len(args.vcf_core_id) != len(args.input_vcf):
+    # -c is matched to -i per caller (both carry a CALLER: prefix), so tally
+    # -i and -c counts per caller and report any caller whose counts differ.
+    vcf_counts = count_by_caller(args.input_vcf)
+    core_counts = count_by_caller(args.vcf_core_id)
+
+    mismatches = []
+    for caller in sorted(set(vcf_counts) | set(core_counts)):
+        n_vcf = vcf_counts.get(caller, 0)
+        n_core = core_counts.get(caller, 0)
+        if n_vcf != n_core:
+            mismatches.append(
+                f"  {caller}: {n_vcf} -i/--input_vcf entr{'y' if n_vcf == 1 else 'ies'} "
+                f"vs. {n_core} -c/--vcf_core_id entr{'y' if n_core == 1 else 'ies'}"
+            )
+
+    if mismatches:
         parser.error(
-            f"-c/--vcf_core_id was given {len(args.vcf_core_id)} time(s) but "
-            f"-i/--input_vcf was given {len(args.input_vcf)} time(s). "
-            "Each -i needs exactly one -c, matched by position."
+            "-i/--input_vcf and -c/--vcf_core_id counts do not match for the "
+            "following caller(s) (each -i needs exactly one -c for that same "
+            "caller):\n" + "\n".join(mismatches)
         )
 
     main(args)
