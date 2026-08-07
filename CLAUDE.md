@@ -24,7 +24,7 @@ Not every CWL has a portal workflow YAML (there are more `.cwl` descriptions tha
 
 ### Portal object registries (`portal_objects/`)
 
-- **`software.yaml`** — one YAML document per tool version (`---` separated). Fields: `name`, `version`, `source_url`, `category`, and `code` (required for the version to appear in output file names). RUFUS has multiple version entries; keep versions here in sync with the `@version` refs in workflow YAMLs and the versions installed in Dockerfiles.
+- **`software.yaml`** — one YAML document per tool version (`---` separated). Fields: `name`, `version`, `source_url`, `category`, and `code` (required for the version to appear in output file names).
 - **`file_reference.yaml`** — reference/resource files (VEP cache, gnomAD, region BEDs, PON, tandem-repeat regions, etc.), one document each. Each carries a `uuid` and `accession` that enable sync with the reference S3 bucket — treat these as stable identifiers; do not regenerate or change them for an existing file.
 
 ## Conventions
