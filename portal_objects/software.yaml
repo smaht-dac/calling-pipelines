@@ -161,3 +161,16 @@ category:
   - Variant Calling
 # Required for displaying in the file name
 code: kanpig
+
+---
+
+################################################################
+# Manta, 1.6.0
+################################################################
+name: Manta
+version: '1.6.0'
+source_url: https://github.com/Illumina/manta
+category:
+  - Variant Calling
+# Required for displaying in the file name
+code: manta
