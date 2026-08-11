@@ -166,7 +166,7 @@ steps:
     run: filter_germline_variants.cwl
     in:
       input_file_vcf_gz:
-        source: merge_callers/output_file_vcf_gz
+        source: merge_callers_v2/output_file_vcf_gz
       germline_input_file_vcf_gz:
         source: germline_input_file_vcf_gz
     out:
@@ -186,7 +186,7 @@ steps:
     run: bcftools_regions.cwl
     in:
       input_file_vcf_gz:
-        source: filter_clustered_variants/output_file_vcf_gz
+        source: filter_clustered_variants_v2/output_file_vcf_gz
       input_files_bed:
         source: input_files_bed
     out:
