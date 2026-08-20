@@ -1,0 +1,229 @@
+#!/usr/bin/env cwl-runner
+
+cwlVersion: v1.0
+
+class: Workflow
+
+requirements:
+  MultipleInputFeatureRequirement: {}
+
+inputs:
+  - id: input_file_vcf_gz
+    type: File
+    secondaryFiles:
+      - .tbi
+    doc: Input VCF (bgzipped) with .tbi index
+
+  - id: germline_input_file_vcf_gz
+    type: File
+    secondaryFiles:
+      - .tbi
+    doc: Germline SNV calls input VCF (bgzipped) with .tbi index
+
+  - id: genome_reference_fasta
+    type: File
+    secondaryFiles:
+      - ^.dict
+      - .fai
+    doc: Reference FASTA with index files
+
+  - id: input_files_sr_cram_tissue_specific
+    type:
+      -
+        items: File
+        type: array
+    secondaryFiles:
+      - .crai
+    doc: Short-read CRAM files for current tissue (with .crai)
+  
+  - id: input_files_core_ids_sr
+    type:
+      -
+        items: string
+        type: array
+    doc: Core identifiers for short-read tissue-specific CRAM files (1:1 match) 
+
+  - id: input_files_sr_cram_donor_pooled
+    type:
+      -
+        items: File
+        type: array
+    secondaryFiles:
+      - .crai
+    doc: Short-read CRAM files for donor (with .crai)
+
+  - id: input_files_pb_cram_donor_pooled
+    type:
+      -
+        items: File
+        type: array
+    secondaryFiles:
+      - .crai
+    doc: PacBio CRAM files for donor (with .crai)
+
+  - id: input_files_all_long_read_cram_donor_pooled
+    type:
+      -
+        items: File
+        type: array
+    secondaryFiles:
+      - .crai
+    doc: All long-read (PacBio + ONT) CRAM files for donor (with .crai)
+
+  - id: input_files_tissue_descriptors_sr
+    type:
+      -
+        items: string
+        type: array
+    doc: Tissue identifiers for donor pooled short read files (e.g. SMHT009-3A)
+
+  - id: input_files_tissue_descriptors_all_long_read
+    type:
+      -
+        items: string
+        type: array
+    doc: Tissue identifiers for donor pooled all long read files (e.g. SMHT009-3A)
+
+  - id: input_files_types_all_long_read
+    type:
+      -
+        items: string
+        type: array
+    doc: Sequencing type identifiers for PacBio + ONT (1:1 match) (e.g. PB ONT)
+  
+  - id: input_files_core_ids_all_long_read
+    type:
+      -
+        items: string
+        type: array
+    doc: Core identifiers for PacBio + ONT CRAM files (1:1 match) 
+
+  - id: additional_args
+    type: string
+    default: "-D -c -C -Q 20 -q 30 -s 0"
+    doc: Additional minipileup args (string)
+
+  - id: additional_args_sr
+    type: string
+    default: "-D -c -C -Q 30 -q 30 -s 0"
+    doc: Additional minipileup args sr only (string)
+
+  - id: sex
+    type: string
+    doc: Donor sex (male, female, unknown)
+
+  - id: input_files_bed
+    type:
+      -
+        items: File
+        type: array
+    doc: List of BED files with regions to exclude from the VCF
+
+  - id: current_tissue 
+    type: string
+    doc: Tissue identifier for current run (e.g. SMHT009-3A)
+
+outputs:
+  output_file_vcf_gz:
+    type: File
+    outputSource: parse_CrossTissue_minipileup_result_v2/output_file_vcf_gz
+
+steps:
+  minipileup_parallel_v2:
+    run: minipileup-parallel_v2.cwl
+    in:
+      input_file_vcf_gz:
+        source: input_file_vcf_gz
+      genome_reference_fasta:
+        source: genome_reference_fasta
+      input_files_sr_cram_tissue_specific:
+        source: input_files_sr_cram_tissue_specific
+      input_files_core_ids_sr:
+        source: input_files_core_ids_sr
+      input_files_all_long_read_cram_donor_pooled:
+        source: input_files_all_long_read_cram_donor_pooled 
+      input_files_tissue_descriptors_all_long_read:
+        source: input_files_tissue_descriptors_all_long_read 
+      input_files_types_all_long_read:
+        source: input_files_types_all_long_read
+      input_files_core_ids_all_long_read:
+        source: input_files_core_ids_all_long_read
+      additional_args:
+        source: additional_args
+    out:
+      - output_file_vcf_gz
+
+  tier_filter_variants_SR_PB_ONT_v2:
+    run: tier_filter_variants_SR_PB_ONT_v2.cwl
+    in:
+      input_file_vcf_gz:
+        source: input_file_vcf_gz
+      minipileup_vcf_gz:
+        source: minipileup_parallel_v2/output_file_vcf_gz
+      current_tissue:
+        source: current_tissue
+    out:
+      - output_file_vcf_gz
+
+  phase_mosaic_snvs:
+    run: phase_mosaic_snvs.cwl
+    in:
+      input_file_vcf_gz:
+        source: tier_filter_variants_SR_PB_ONT_v2/output_file_vcf_gz
+      germline_input_file_vcf_gz:
+        source: germline_input_file_vcf_gz
+      genome_reference_fasta:
+        source: genome_reference_fasta
+      input_files_pb_cram_donor_pooled:
+        source: input_files_pb_cram_donor_pooled 
+      sex:
+        source: sex
+    out:
+      - output_file_vcf_gz
+
+  bcftools_regions:
+    run: bcftools_regions.cwl
+    in:
+      input_file_vcf_gz:
+        source: phase_mosaic_snvs/output_file_vcf_gz
+      input_files_bed:
+        source: input_files_bed
+    out:
+      - output_file_vcf_gz
+
+  minipileup_parallel_sr_only_v2:
+    run: minipileup-parallel_sr_only_v2.cwl
+    in:
+      input_file_vcf_gz:
+        source: bcftools_regions/output_file_vcf_gz
+      genome_reference_fasta:
+        source: genome_reference_fasta
+      input_files_sr_cram_donor_pooled:
+        source: input_files_sr_cram_donor_pooled
+      input_files_tissue_descriptors_sr:
+        source: input_files_tissue_descriptors_sr
+      additional_args_sr:
+        source: additional_args_sr
+    out:
+      - output_file_vcf_gz
+
+  parse_CrossTissue_minipileup_result_v2:
+    run: parse_CrossTissue_minipileup_result_v2.cwl
+    in:
+      input_file_vcf_gz:
+        source: phase_mosaic_snvs/output_file_vcf_gz
+      minipileup_vcf_gz:
+        source: minipileup_parallel_sr_only_v2/output_file_vcf_gz
+      current_tissue:
+        source: current_tissue
+    out:
+      - output_file_vcf_gz
+
+
+doc: |
+  Filters an SNV VCF file to retain high-confidence variants. |
+  Step-2 filters: run minipileup using short-read and long-read CRAM files to compute read support for each SNV, |
+  then filter and tier based on read support, strand balance (Fisher) and germline deviation (binomial), |
+  then phase/filter based on nearest germline variant, |
+  then check all other SR within the donor for CrossTissue variants, |
+  then output a final vcf with PASS and LowEvidence filters annotated

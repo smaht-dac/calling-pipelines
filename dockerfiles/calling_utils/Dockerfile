@@ -78,15 +78,15 @@ WORKDIR /usr/local/bin/
 RUN ln -s minipileup-1.4b minipileup
 
 ## minipileup2 (used by v2)
-RUN git clone https://github.com/corinsexton/minipileup.git minipileup2-src && \
-    cd minipileup2-src && \
-    git checkout 8a72f5aeaa6ee61c77461dadd087b37f2db8622b
+RUN wget https://github.com/corinsexton/minipileup/archive/refs/tags/v1.0.0.tar.gz && \
+    tar -xzf v1.0.0.tar.gz && \
+    rm -rf v1.0.0.tar.gz
 
-WORKDIR /usr/local/bin/minipileup2-src
-RUN make
+WORKDIR /usr/local/bin/minipileup-1.0.0
+RUN make 
 
 WORKDIR /usr/local/bin/
-RUN ln -s minipileup2-src/minipileup2 minipileup2
+RUN ln -s minipileup-1.0.0 minipileup2
 
 ## Bedtools install
 RUN wget https://github.com/arq5x/bedtools2/releases/download/v2.31.1/bedtools-2.31.1.tar.gz && \
@@ -126,6 +126,10 @@ RUN chmod +x split_snvs_indels.sh
 COPY minipileup-parallel.sh .
 RUN chmod +x minipileup-parallel.sh
 
+## minipileup-parallel_v2
+COPY minipileup-parallel_v2.sh .
+RUN chmod +x minipileup-parallel_v2.sh
+
 ## remove_germline_variants.sh
 COPY remove_germline_variants.sh .
 RUN chmod +x remove_germline_variants.sh
@@ -138,9 +142,17 @@ RUN chmod +x phase_mosaic_vars.sh
 COPY minipileup-parallel_sr_only.sh .
 RUN chmod +x minipileup-parallel_sr_only.sh
 
+## minipileup-parallel_sr_only_v2.sh
+COPY minipileup-parallel_sr_only_v2.sh .
+RUN chmod +x minipileup-parallel_sr_only_v2.sh
+
 ## parse_CrossTissue_minipileup_result.sh
 COPY parse_CrossTissue_minipileup_result.sh .
 RUN chmod +x parse_CrossTissue_minipileup_result.sh
+
+## parse_CrossTissue_minipileup_result_v2.sh
+COPY parse_CrossTissue_minipileup_result_v2.sh .
+RUN chmod +x parse_CrossTissue_minipileup_result_v2.sh
 
 ## scripts/
 # filter_by_poe.py
@@ -158,6 +170,10 @@ RUN chmod +x filter_clustered_variants_v2.py
 # tier_filter_variants_SR_PB_ONT.py
 COPY scripts/tier_filter_variants_SR_PB_ONT.py .
 RUN chmod +x tier_filter_variants_SR_PB_ONT.py
+
+# tier_filter_variants_SR_PB_ONT_v2.py
+COPY scripts/tier_filter_variants_SR_PB_ONT_v2.py .
+RUN chmod +x tier_filter_variants_SR_PB_ONT_v2.py
 
 # phasing_step1_get_closest_germline.sh
 COPY scripts/phasing_step1_get_closest_germline.sh .
@@ -179,9 +195,17 @@ RUN chmod +x merge_callers_v2.py
 COPY scripts/parse_minipileup_sr_only.py .
 RUN chmod +x parse_minipileup_sr_only.py
 
+# parse_minipileup_sr_only_v2.py
+COPY scripts/parse_minipileup_sr_only_v2.py .
+RUN chmod +x parse_minipileup_sr_only_v2.py
+
 # set_filter_vcf.py
 COPY scripts/set_filter_vcf.py .
 RUN chmod +x set_filter_vcf.py
+
+# set_filter_vcf_v2.py
+COPY scripts/set_filter_vcf_v2.py .
+RUN chmod +x set_filter_vcf_v2.py
 
 #######################################################################
 #     Update env

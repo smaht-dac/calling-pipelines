@@ -136,4 +136,4 @@ outputs:
 doc: |
   Merges variant calls from multiple callers into a single VCF file. |
   Supports TNhaplotyper2, Strelka2, longcallD, and RUFUS callers. |
-  v2 supports core-specific and merged calling VCF files.
+  v2 supports core-specific and merged calling VCF files
