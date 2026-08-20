@@ -22,7 +22,7 @@ runner:
 
 software:
   - minipileup@1.4b
-  - minipileup2@v1.0.0
+  - minipileup2@1.0.0
   - Bcftools@1.23
   - Bedtools@v2.31.1
 
