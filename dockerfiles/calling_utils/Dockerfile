@@ -3,18 +3,20 @@
 #######################################################################
 FROM public.ecr.aws/smaht-dac/base-ubuntu2204-py39:0.0.1
 
-LABEL maintainers="Michele Berselli (berselli.michele@gmail.com)"
+LABEL maintainers="Michele Berselli (berselli.michele@gmail.com), Charlotte Zhang (charlotte_zhang@hms.harvard.edu)"
 
 #######################################################################
 #     General updates & installing necessary Linux components
 #       - libncurses-dev, libbz2-dev, liblzma-dev used by samtools
+#       - libhts-dev used by minipileup2
 #######################################################################
 RUN apt-get update -y && apt-get install -y \
     locales \
     tabix=1.13+ds-2build1 \
-    libncurses-dev=6.3-2ubuntu0.1 \
+    libncurses-dev=6.3-2ubuntu0.2 \
     libbz2-dev=1.0.8-5build1 \
-    liblzma-dev=5.2.5-2ubuntu1 \
+    liblzma-dev=5.2.5-2ubuntu1.1 \
+    libhts-dev=1.13+ds-2build1 \
     --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -75,6 +77,17 @@ RUN make
 WORKDIR /usr/local/bin/
 RUN ln -s minipileup-1.4b minipileup
 
+## minipileup2 (used by v2)
+RUN wget https://github.com/corinsexton/minipileup/archive/refs/tags/v1.0.0.tar.gz && \
+    tar -xzf v1.0.0.tar.gz && \
+    rm -rf v1.0.0.tar.gz
+
+WORKDIR /usr/local/bin/minipileup-1.0.0
+RUN make 
+
+WORKDIR /usr/local/bin/
+RUN ln -s minipileup-1.0.0 minipileup2
+
 ## Bedtools install
 RUN wget https://github.com/arq5x/bedtools2/releases/download/v2.31.1/bedtools-2.31.1.tar.gz && \
     tar -xzf bedtools-2.31.1.tar.gz && \
@@ -113,6 +126,10 @@ RUN chmod +x split_snvs_indels.sh
 COPY minipileup-parallel.sh .
 RUN chmod +x minipileup-parallel.sh
 
+## minipileup-parallel_v2
+COPY minipileup-parallel_v2.sh .
+RUN chmod +x minipileup-parallel_v2.sh
+
 ## remove_germline_variants.sh
 COPY remove_germline_variants.sh .
 RUN chmod +x remove_germline_variants.sh
@@ -125,9 +142,17 @@ RUN chmod +x phase_mosaic_vars.sh
 COPY minipileup-parallel_sr_only.sh .
 RUN chmod +x minipileup-parallel_sr_only.sh
 
+## minipileup-parallel_sr_only_v2.sh
+COPY minipileup-parallel_sr_only_v2.sh .
+RUN chmod +x minipileup-parallel_sr_only_v2.sh
+
 ## parse_CrossTissue_minipileup_result.sh
 COPY parse_CrossTissue_minipileup_result.sh .
 RUN chmod +x parse_CrossTissue_minipileup_result.sh
+
+## parse_CrossTissue_minipileup_result_v2.sh
+COPY parse_CrossTissue_minipileup_result_v2.sh .
+RUN chmod +x parse_CrossTissue_minipileup_result_v2.sh
 
 ## scripts/
 # filter_by_poe.py
@@ -138,9 +163,17 @@ RUN chmod +x filter_by_poe.py
 COPY scripts/filter_clustered_variants.py .
 RUN chmod +x filter_clustered_variants.py
 
+# filter_clustered_variants_v2.py
+COPY scripts/filter_clustered_variants_v2.py .
+RUN chmod +x filter_clustered_variants_v2.py
+
 # tier_filter_variants_SR_PB_ONT.py
 COPY scripts/tier_filter_variants_SR_PB_ONT.py .
 RUN chmod +x tier_filter_variants_SR_PB_ONT.py
+
+# tier_filter_variants_SR_PB_ONT_v2.py
+COPY scripts/tier_filter_variants_SR_PB_ONT_v2.py .
+RUN chmod +x tier_filter_variants_SR_PB_ONT_v2.py
 
 # phasing_step1_get_closest_germline.sh
 COPY scripts/phasing_step1_get_closest_germline.sh .
@@ -154,13 +187,25 @@ RUN chmod +x phasing_step2_phase_mosaic.py
 COPY scripts/merge_callers.py .
 RUN chmod +x merge_callers.py
 
+# merge_callers_v2.py
+COPY scripts/merge_callers_v2.py .
+RUN chmod +x merge_callers_v2.py
+
 # parse_minipileup_sr_only.py
 COPY scripts/parse_minipileup_sr_only.py .
 RUN chmod +x parse_minipileup_sr_only.py
 
+# parse_minipileup_sr_only_v2.py
+COPY scripts/parse_minipileup_sr_only_v2.py .
+RUN chmod +x parse_minipileup_sr_only_v2.py
+
 # set_filter_vcf.py
 COPY scripts/set_filter_vcf.py .
 RUN chmod +x set_filter_vcf.py
+
+# set_filter_vcf_v2.py
+COPY scripts/set_filter_vcf_v2.py .
+RUN chmod +x set_filter_vcf_v2.py
 
 #######################################################################
 #     Update env
@@ -169,6 +214,7 @@ ENV PATH=/usr/local/bin/:$PATH
 ENV PATH=/usr/local/bin/samtools/:$PATH
 ENV PATH=/usr/local/bin/bcftools/:$PATH
 ENV PATH=/usr/local/bin/minipileup/:$PATH
+ENV PATH=/usr/local/bin/minipileup2/:$PATH
 ENV PATH=/usr/local/bin/bedtools/bin/:$PATH
 
 CMD ["bash"]
