@@ -13,8 +13,8 @@ LABEL maintainers="Michele Berselli (berselli.michele@gmail.com), Charlotte Zhan
 RUN apt-get update -y && apt-get install -y \
     locales \
     tabix=1.13+ds-2build1 \
-    libncurses-dev=6.3-2ubuntu0.2 \
-    libbz2-dev=1.0.8-5build1 \
+    libncurses-dev=6.3-2ubuntu0.3 \
+    libbz2-dev=1.0.8-5ubuntu0.1 \
     liblzma-dev=5.2.5-2ubuntu1.1 \
     libhts-dev=1.13+ds-2build1 \
     --no-install-recommends \

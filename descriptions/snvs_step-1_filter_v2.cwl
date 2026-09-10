@@ -247,7 +247,7 @@ steps:
 
 doc: |
   Filters a VCF file to retain high-confidence variants. |
-  Step-1 filters: Merge variants from callers (need pre-filtered PASS calls, normalized and atomized) (includes core-specific and merged calling); |
+  Step-1 filters: Merge variants from callers (need pre-filtered PASS core-specific and merged calls, normalized and atomized); |
   remove germline and clustered variants; remove difficult genomic regions; |
   Brain Somatic Mosaicism Network (BSMN) filter; run VEP and filter by allele frequency. |
   Splits the filtered variants into separate SNV and indel VCF files
