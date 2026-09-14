@@ -3,7 +3,7 @@
 #############################################################
 name: snvs_step-1_filter_v2
 description:   Filters a VCF file to retain high-confidence variants. |
-               Merge variants from callers (pre-filtered PASS calls, normalized and atomized) (includes core-specific and merged calling); |
+               Merge variants from callers (pre-filtered PASS core-specific and merged calls, normalized and atomized); |
                remove germline and clustered variants; remove difficult genomic regions; |
                Brain Somatic Mosaicism Network (BSMN) filter; run VEP and filter by allele frequency. |
                Splits the filtered variants into separate SNV and indel VCF files

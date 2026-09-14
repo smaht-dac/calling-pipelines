@@ -21,7 +21,6 @@ runner:
     - parse_CrossTissue_minipileup_result_v2.cwl
 
 software:
-  - minipileup@1.4b
   - minipileup2@1.0.0
   - Bcftools@1.23
   - Bedtools@v2.31.1
