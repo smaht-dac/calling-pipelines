@@ -22,6 +22,17 @@ category:
 ---
 
 ################################################################
+# minipileup2, 1.0.0
+################################################################
+name: minipileup2
+version: '1.0.0'
+source_url: https://github.com/corinsexton/minipileup
+category:
+  - Variant Calling
+
+---
+
+################################################################
 # granite-suite, 0.5.0
 ################################################################
 name: granite-suite
@@ -117,6 +128,19 @@ code: rufus
 ################################################################
 name: SmahtSNV
 version: '1.0.0'
+source_url: https://github.com/smaht-dac/calling-pipelines
+category:
+  - Variant Calling
+# Required for displaying in the file name
+code: SmahtSNV
+
+---
+
+################################################################
+# SMaHT SNV pipeline, 2.0.0
+################################################################
+name: SmahtSNV
+version: '2.0.0'
 source_url: https://github.com/smaht-dac/calling-pipelines
 category:
   - Variant Calling
